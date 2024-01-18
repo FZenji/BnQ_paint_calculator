@@ -241,14 +241,16 @@ def finish(total_size):
     opt = ""
     while opt not in ['1', '2', '3']:
         opt = input()
-    if opt == '1':
-        brand = 0
-    elif opt == '2':
-        brand = 1
-    elif opt == '3':
-        brand = 2
-    else:
-        print("Invalid, defualting to medium")
+    match opt:
+        case '1':
+            brand = 0
+        case '2':
+            brand = 1
+        case '3':
+            brand = 2
+        case _:
+            print("Invalid, defualting to medium")
+            brand = 1
 
     litres = final_area / (9 + (brand))
     buckets = bucketsCalc(litres)
