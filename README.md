@@ -36,7 +36,7 @@ python ../path_to_file/BnQ_paint.py
 
 ## Dependencies
 
-This project has a dependency on the `math` library, which is a standard library in Python.
+This project requires Python 3.10 or above and has a dependency on the `math` library, which is a standard library in Python.
 
 ## License
 
