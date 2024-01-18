@@ -1,6 +1,15 @@
 import math
 
 def wallSize():
+    '''
+    Collects information about the length and width of a wall from the user,
+    ensuring valid numerical entries within the range of 0.01 to 500 meters.
+    Calculates the total wall size and subtracts the area occupied by obstructions.
+    Returns the adjusted wall size.
+
+    Returns:
+    float: Adjusted wall size in square meters.
+    '''
     while 1:
         try:
             length = float(input("What is the length of the wall (meters)? "))
@@ -31,6 +40,16 @@ def wallSize():
     return wall_size_obs
 
 def obstructions(wall_size):
+    '''
+    Determines if there are obstructions on a wall, calculates and returns the total area
+    occupied by the obstructions. If no obstructions are present, returns 0.
+
+    Parameters:
+    wall_size (float): The total size of the wall in square meters.
+
+    Returns:
+    float: Total area occupied by obstructions, or 0 if no obstructions are present.
+    '''
     c = ""
     while c.lower() not in ["y", "n"]:
         c = input("Are there any obstructions on the wall? (Y/N)")
@@ -150,6 +169,17 @@ def obstructions(wall_size):
         return 0
 
 def bucketsCalc(final_area):
+    '''
+    Calculates the number of paint buckets needed to cover a given area,
+    considering available bucket sizes (10L, 5L, 2L, and 1L).
+
+    Parameters:
+    final_area (float): The total area to be covered in square meters.
+
+    Returns:
+    list: A list of lists containing the required paint bucket sizes and their quantities.
+          Each inner list has the format [bucket_size, quantity].
+    '''
     round_area = math.ceil(final_area)
     
     tenL = (round_area) // 10
@@ -171,6 +201,16 @@ def bucketsCalc(final_area):
     return bucketsNeeded
 
 def finish(total_size):
+    '''
+    Calculates the cost and required paint buckets for finishing a wall,
+    considering the number of coats, total wall size, and user-selected paint brand.
+
+    Parameters:
+    total_size (float): The initial total size of the wall in square meters.
+
+    Returns:
+    None
+    '''
     cost = 0
     brand = 1
     prices = [{"10L": 40,
