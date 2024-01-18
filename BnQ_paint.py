@@ -26,17 +26,18 @@ def wallSize():
     obs = obstructions(wall_size)
     wall_size_obs = (float(length) * float(width)) - obs
 
-    print(f"Your wall is {wall_size_obs}m large.")
+    print(f"Your wall is {wall_size_obs:.2f}m large.")
 
     return wall_size_obs
 
 def obstructions(wall_size):
     c = ""
-    while c.lower not in ["y", "n"]:
+    while c.lower() not in ["y", "n"]:
         c = input("Are there any obstructions on the wall? (Y/N)")
     if c.lower() == "y":
-        obs_area = 0
+        obs_area = math.inf
         while obs_area >= wall_size:
+            obs_area = 0
             while 1:
                 try:
                     nos = int(input("How many obstructions are there on the wall? "))
@@ -44,7 +45,7 @@ def obstructions(wall_size):
                 except ValueError:
                     print("Not an integer. Try again.")
                 except AssertionError:
-                    print("Must be between 0 and 10 obstructions.")
+                    print("Must be between 1 and 10 obstructions.")
                 else:
                     break
             for i in range(nos):
@@ -128,6 +129,9 @@ def obstructions(wall_size):
                     width = float(input("What is the width of the obstruction (meters)? "))
                     height = float(input("What is the height of the obstruction (meters)? "))
                     obs_area += width * height
+
+            if obs_area >= wall_size:
+                print("The obsticles must be smaller than the wall.")
             
         return obs_area
     elif c.lower() == "n":
@@ -206,7 +210,7 @@ def finish(total_size):
 def menu():
     total_size = 0
     while 1:
-        print(f"Size: {total_size}")
+        print(f"Size: {total_size:.2f}")
         print("**********************")
         print("* 1. Add Wall        *")
         print("* 2. Finish          *")
