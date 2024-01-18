@@ -230,11 +230,14 @@ def finish(total_size):
 
     print("What brand of paint would you like for this wall?")
     print(f" 1. GoodHome ", end="")
-    print(*[f'| {key}: £{value}' for key, value in prices[0].items()])
+    print(*[f'| {key}: £{value}' for key, value in prices[0].items()], end="")
+    print(" || Covers 5 square meters per litre")
     print(f" 2. Dulux ", end="")
-    print(*[f'| {key}: £{value}' for key, value in prices[1].items()])
+    print(*[f'| {key}: £{value}' for key, value in prices[1].items()], end="")
+    print(" || Covers 10 square meters per litre")
     print(f" 3. Crown ", end="")
-    print(*[f'| {key}: £{value}' for key, value in prices[2].items()])
+    print(*[f'| {key}: £{value}' for key, value in prices[2].items()], end="")
+    print(" || Covers 15 square meters per litre")
     opt = ""
     while opt not in ['1', '2', '3']:
         opt = input()
@@ -259,7 +262,7 @@ def finish(total_size):
 def menu():
     total_size = 0
     while 1:
-        print(f"Size: {total_size:.2f}m2")
+        print(f"Size: {total_size:.2f} m2")
         print("**********************")
         print("* 1. Add Wall        *")
         print("* 2. Finish          *")
