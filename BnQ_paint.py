@@ -263,6 +263,14 @@ def finish(total_size):
     quit()
 
 def menu():
+    '''
+    Provides an interactive menu for the Paint Estimation Tool. Users can choose
+    to add a wall or finish the estimation process. The total wall size is displayed
+    during the menu interaction.
+
+    Returns:
+    None
+    '''
     total_size = 0
     while 1:
         print(f"Size: {total_size:.2f} m2")
