@@ -20,33 +20,12 @@ def setup():
     return coats, area_per_litre
 
 def wallSize():
-    # paint_type = {5: "Cheap",
-    #               10: "Medium",
-    #               15: "Expensive"}
-
     length = float(input("What is the length of the wall (meters)? "))
     width = float(input("What is the width of the wall (meters)? "))
-    # coats = int(input("How many coats? "))
-    # print("What brand of paint would you like for this wall?")
-    # print(" 1. Cheap | £5 / sqm")
-    # print(" 2. Medium | £10 / sqm")
-    # print(" 3. Expensive | £15 / sqm")
-    # opt = input()
-    # if opt.lower() == 'cheap' or opt == '1':
-    #     area_per_litre = 5
-    # elif opt.lower() == 'medium' or opt == '2':
-    #     area_per_litre = 10
-    # elif opt.lower() == 'expensive' or opt == '3':
-    #     area_per_litre = 15
-    # else:
-    #     print("Invalid, defualting to medium")
     
     obs = obstructions()
-
     wall_size = (length * width) - obs
-    # litres = (wall_size * coats) / area_per_litre
 
-    # print(f"You need {litres} litres of {paint_type[area_per_litre]} paint for this wall.")
     print(f"Your wall is {wall_size}m large.")
 
     return wall_size
@@ -58,9 +37,30 @@ def obstructions():
         nos = int(input("How many obstructions are there on the wall? "))
         for i in range(nos):
             print(f"Obstruction {i+1}:")
-            width = float(input("What is the width of the obstruction (meters)? "))
-            height = float(input("What is the height of the obstruction (meters)? "))
-            obs_area += width * height
+            print("What shape is this obstruction?")
+            print(" 1. Rectangle")
+            print(" 2. Triangle")
+            print(" 3. Circle")
+            shape = input()
+            if shape == '1':
+                width = float(input("What is the width of the obstruction (meters)? "))
+                height = float(input("What is the height of the obstruction (meters)? "))
+                obs_area += width * height
+            elif shape == '2':
+                a = float(input("Side 1: "))
+                b = float(input("Side 2: "))
+                c = float(input("Side 3: "))
+                s = (a + b + c) / 2
+                obs_area += math.sqrt(s * (s - a) * (s - b) * (s - c))
+            elif shape == '3':
+                diameter = float(input("What is the diameter of the circle (meters)? "))
+                obs_area += math.pi * ((diameter / 2) ** 2)
+            else:
+                print("Invalid, defaulting to rectangle")
+                width = float(input("What is the width of the obstruction (meters)? "))
+                height = float(input("What is the height of the obstruction (meters)? "))
+                obs_area += width * height
+            
         return obs_area
     elif c.lower() == "n":
         return 0
