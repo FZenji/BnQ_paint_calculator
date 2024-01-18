@@ -163,7 +163,7 @@ export default function Home() {
           <div className="flex flex-col justify-between">
             <h2 className="mb-3 text-4xl font-semibold opacity-90">Total</h2>
             <Button onClick={(e) => callAPI(wallState)}>Get Total</Button>
-            <Button onClick={handleAPI}>Get Total</Button>
+            {/* <Button onClick={handleAPI}>Get Total</Button> */}
             <p>{data}</p>
           </div>
         </div>
