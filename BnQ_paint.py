@@ -26,7 +26,7 @@ def wallSize():
     obs = obstructions(wall_size)
     wall_size_obs = (float(length) * float(width)) - obs
 
-    print(f"Your wall is {wall_size_obs:.2f}m large.")
+    print(f"Your wall is {wall_size_obs:.2f}m2 large.")
 
     return wall_size_obs
 
@@ -81,37 +81,46 @@ def obstructions(wall_size):
                     obs_area += width * height
                 elif shape == '2':
                     while 1:
-                        try:      
-                            a = float(input("Side 1: "))
-                            assert a > 0
-                        except ValueError:
-                            print("Not a number. Try again.")
-                        except AssertionError:
-                            print("Must be above 0m.")
-                        else:
-                            break
-                    while 1:
                         try:
-                            b = float(input("Side 2: "))
-                            assert b > 0
+                            while 1:
+                                try:      
+                                    a = float(input("Side 1: "))
+                                    assert a > 0
+                                except ValueError:
+                                    print("Not a number. Try again.")
+                                except AssertionError:
+                                    print("Must be above 0m.")
+                                else:
+                                    break
+                            while 1:
+                                try:
+                                    b = float(input("Side 2: "))
+                                    assert b > 0
+                                except ValueError:
+                                    print("Not a number. Try again.")
+                                except AssertionError:
+                                    print("Must be above 0m.")
+                                else:
+                                    break
+                            while 1:
+                                try:
+                                    c = float(input("Side 3: "))
+                                    assert c > 0
+                                except ValueError:
+                                    print("Not a number. Try again.")
+                                except AssertionError:
+                                    print("Must be above 0m.")
+                                else:
+                                    break
+                            s = (a + b + c) / 2
+                            obs_area += math.sqrt(s * (s - a) * (s - b) * (s - c))
+                            assert obs_area > 0
                         except ValueError:
-                            print("Not a number. Try again.")
+                            print("The sum of two side lengths has to exceed the length of the third side.")
                         except AssertionError:
-                            print("Must be above 0m.")
+                            print("The sum of two side lengths has to exceed the length of the third side.")
                         else:
                             break
-                    while 1:
-                        try:
-                            c = float(input("Side 3: "))
-                            assert c > 0
-                        except ValueError:
-                            print("Not a number. Try again.")
-                        except AssertionError:
-                            print("Must be above 0m.")
-                        else:
-                            break
-                    s = (a + b + c) / 2
-                    obs_area += math.sqrt(s * (s - a) * (s - b) * (s - c))
                 elif shape == '3':
                     while 1:
                         try:
@@ -198,7 +207,7 @@ def finish(total_size):
     else:
         print("Invalid, defualting to medium")
 
-    buckets = bucketsCalc(final_area)
+    buckets = bucketsCalc(final_area / ((brand + 1) * 5))
 
     for bucket in buckets:
         cost += prices[brand][bucket[0]] * bucket[1]
@@ -210,7 +219,7 @@ def finish(total_size):
 def menu():
     total_size = 0
     while 1:
-        print(f"Size: {total_size:.2f}")
+        print(f"Size: {total_size:.2f}m2")
         print("**********************")
         print("* 1. Add Wall        *")
         print("* 2. Finish          *")
