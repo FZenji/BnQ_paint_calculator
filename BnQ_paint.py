@@ -225,7 +225,17 @@ def finish(total_size):
               "5L": 40,
               "2L": 20,
               "1L": 15}]
-    coats = int(input("How many coats? "))
+    while 1:
+        try:
+            coats = int(input("How many coats? "))
+            assert 1 < coats < 10
+        except ValueError:
+            print("Not an integer. Try again.")
+        except AssertionError:
+            print("Must be between 1 and 10 coats.")
+        else:
+            break
+
     final_area = total_size * coats
 
     print("What brand of paint would you like for this wall?")
