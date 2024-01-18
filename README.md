@@ -24,20 +24,14 @@ Calculates the cost and required paint buckets for finishing a wall, considering
 
 ## Usage
 
-1. Run the `wallSize()` function to input information about the wall.
-2. Use the `obstructions(wall_size)` function to handle obstructions if present.
-3. Apply the `bucketsCalc(final_area)` function to calculate required paint buckets.
-4. Finalize the process with the `finish(total_size)` function, specifying the brand and obtaining cost details.
+1. Run the Python file `BnQ_paint.py` in the terminal.
+2. Follow the on screen instructions to finalise the paint amount, cost, and buckets needed.
 
 ## Example
 
-```python
+```powershell
 # Example usage
-total_size = wallSize()
-obstruction_area = obstructions(total_size)
-final_area = total_size - obstruction_area
-paint_buckets = bucketsCalc(final_area)
-finish(final_area)
+python ../path_to_file/BnQ_paint.py
 ```
 
 ## Dependencies
