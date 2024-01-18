@@ -69,7 +69,26 @@ def obstructions():
         return 0
 
 def bucketsCalc(final_area):
-    return 0
+    round_area = math.ceil(final_area)
+    
+    tenL = (round_area) // 10
+    fiveL = (round_area - (tenL * 10)) // 5
+    twoL = (round_area - (tenL * 10) - (fiveL * 5)) // 2
+    oneL = (round_area - (tenL * 10) - (fiveL * 5) - (twoL * 2)) // 1
+
+    bucketDict = {"10L": tenL,
+                  "5L": fiveL,
+                  "2L": twoL,
+                  "1L": oneL}
+    
+    bucketsNeeded = []
+
+    for key, value in bucketDict.items():
+        if value != 0:
+            bucketsNeeded.append([key, value])
+
+
+    return bucketsNeeded
 
 def finish(total_size):
     cost = 0
@@ -97,7 +116,9 @@ def finish(total_size):
 
     buckets = bucketsCalc(final_area)
 
-    print(f"Final cost of paint is £{cost}, you will need to buy {buckets}.")
+    print(f"Final cost of paint is £{cost}, you will need to buy the following buckets:")
+    print("\n".join(f"{bucket[0]}: {bucket[1]}" for bucket in buckets))
+    quit()
 
 def menu():
     total_size = 0
