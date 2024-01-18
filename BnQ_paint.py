@@ -231,13 +231,13 @@ def finish(total_size):
     print("What brand of paint would you like for this wall?")
     print(f" 1. GoodHome ", end="")
     print(*[f'| {key}: £{value}' for key, value in prices[0].items()], end="")
-    print(" || Covers 5 square meters per litre")
+    print(" || Covers 9 square meters per litre")
     print(f" 2. Dulux ", end="")
     print(*[f'| {key}: £{value}' for key, value in prices[1].items()], end="")
     print(" || Covers 10 square meters per litre")
     print(f" 3. Crown ", end="")
     print(*[f'| {key}: £{value}' for key, value in prices[2].items()], end="")
-    print(" || Covers 15 square meters per litre")
+    print(" || Covers 11 square meters per litre")
     opt = ""
     while opt not in ['1', '2', '3']:
         opt = input()
@@ -250,12 +250,13 @@ def finish(total_size):
     else:
         print("Invalid, defualting to medium")
 
-    buckets = bucketsCalc(final_area / ((brand + 1) * 5))
+    litres = final_area / (9 + (brand))
+    buckets = bucketsCalc(litres)
 
     for bucket in buckets:
         cost += prices[brand][bucket[0]] * bucket[1]
 
-    print(f"Final cost of paint is £{cost}, you will need to buy the following buckets:")
+    print(f"You will need {litres:.2f} litres of paint. Final cost of paint is £{cost}, you will need to buy the following buckets:")
     print("\n".join(f"{bucket[0]}: {bucket[1]}" for bucket in buckets))
     quit()
 
