@@ -24,8 +24,8 @@ def wallSize():
     #               10: "Medium",
     #               15: "Expensive"}
 
-    length = int(input("What is the length of the wall (meters)? "))
-    width = int(input("What is the width of the wall (meters)? "))
+    length = float(input("What is the length of the wall (meters)? "))
+    width = float(input("What is the width of the wall (meters)? "))
     # coats = int(input("How many coats? "))
     # print("What brand of paint would you like for this wall?")
     # print(" 1. Cheap | £5 / sqm")
@@ -58,8 +58,8 @@ def obstructions():
         nos = int(input("How many obstructions are there on the wall? "))
         for i in range(nos):
             print(f"Obstruction {i+1}:")
-            width = int(input("What is the width of the obstruction (meters)? "))
-            height = int(input("What is the height of the obstruction (meters)? "))
+            width = float(input("What is the width of the obstruction (meters)? "))
+            height = float(input("What is the height of the obstruction (meters)? "))
             obs_area += width * height
         return obs_area
     elif c.lower() == "n":
@@ -112,7 +112,7 @@ def menu():
         # if total_litres == 0:
         #     coats, area_per_litre = setup()
         if opt == '1':
-            total_litres += wallSize()
+            total_size += wallSize()
         elif opt == '2':
             finish(total_size)
         else:
