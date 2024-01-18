@@ -1,12 +1,26 @@
 import math
 
 def wallSize():
-    length = ""
-    while length not in range(0, 501):
-        length = input("What is the length of the wall (meters)? ")
-    width = ""
-    while width not in range(0, 501):
-        width = float(input("What is the width of the wall (meters)? "))
+    while 1:
+        try:
+            length = float(input("What is the length of the wall (meters)? "))
+            assert 0 < length <= 500
+        except ValueError:
+            print("Not a number.")
+        except AssertionError:
+            print("Must be between 0m and 500m.")
+        else:
+            break
+    while 1:
+        try:
+            width = float(input("What is the width of the wall (meters)? "))
+            assert 0 < width <= 500
+        except ValueError:
+            print("Not a number.")
+        except AssertionError:
+            print("Must be between 0m and 500m.")
+        else:
+            break
     
     wall_size = float(length) * float(width)
     obs = obstructions(wall_size)
@@ -23,13 +37,16 @@ def obstructions(wall_size):
     if c.lower() == "y":
         obs_area = 0
         while obs_area >= wall_size:
-            nos = ""
-            while nos not in range(10):
+            while 1:
                 try:
                     nos = int(input("How many obstructions are there on the wall? "))
+                    assert 0 < nos <= 10
                 except ValueError:
                     print("Not an integer. Try again.")
-                    nos = ""
+                except AssertionError:
+                    print("Must be between 0 and 10 obstructions.")
+                else:
+                    break
             for i in range(nos):
                 print(f"Obstruction {i+1}:")
                 print("What shape is this obstruction?")
@@ -40,17 +57,71 @@ def obstructions(wall_size):
                 while shape not in ['1', '2', '3']:
                     shape = input()
                 if shape == '1':
-                    width = float(input("What is the width of the obstruction (meters)? "))
-                    height = float(input("What is the height of the obstruction (meters)? "))
+                    while 1:
+                        try:
+                            width = float(input("What is the width of the obstruction (meters)? "))
+                            assert 0 < width <= 500
+                        except ValueError:
+                            print("Not a number. Try again.")
+                        except AssertionError:
+                            print("Must be between 0 and 500m.")
+                        else:
+                            break
+                    while 1:
+                        try:
+                            height = float(input("What is the height of the obstruction (meters)? "))
+                            assert 0 < height <= 500
+                        except ValueError:
+                            print("Not a number. Try again.")
+                        except AssertionError:
+                            print("Must be between 0 and 500m.")
+                        else:
+                            break
                     obs_area += width * height
                 elif shape == '2':
-                    a = float(input("Side 1: "))
-                    b = float(input("Side 2: "))
-                    c = float(input("Side 3: "))
+                    while 1:
+                        try:      
+                            a = float(input("Side 1: "))
+                            assert a > 0
+                        except ValueError:
+                            print("Not a number. Try again.")
+                        except AssertionError:
+                            print("Must be above 0m.")
+                        else:
+                            break
+                    while 1:
+                        try:
+                            b = float(input("Side 2: "))
+                            assert b > 0
+                        except ValueError:
+                            print("Not a number. Try again.")
+                        except AssertionError:
+                            print("Must be above 0m.")
+                        else:
+                            break
+                    while 1:
+                        try:
+                            c = float(input("Side 3: "))
+                            assert c > 0
+                        except ValueError:
+                            print("Not a number. Try again.")
+                        except AssertionError:
+                            print("Must be above 0m.")
+                        else:
+                            break
                     s = (a + b + c) / 2
                     obs_area += math.sqrt(s * (s - a) * (s - b) * (s - c))
                 elif shape == '3':
-                    diameter = float(input("What is the diameter of the circle (meters)? "))
+                    while 1:
+                        try:
+                            diameter = float(input("What is the diameter of the circle (meters)? "))
+                            assert diameter > 0
+                        except ValueError:
+                            print("Not a number. Try again.")
+                        except AssertionError:
+                            print("Must be above 0m.")
+                        else:
+                            break
                     obs_area += math.pi * ((diameter / 2) ** 2)
                 else:
                     print("Invalid, defaulting to rectangle")
