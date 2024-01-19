@@ -11,26 +11,26 @@ NOS_MINES = 10
 BOARDER = 10
 
 # Set difficulty
-difficulty = input("Difficulty\n---------\n[1] Easy\n[2] Medium\n[3] Hard\n")
-match difficulty:
-    case '2':
-        WIDTH = 900
-        COLS, ROWS = 18, 14
-        CELL_SIZE = WIDTH // COLS
-        HEIGHT = CELL_SIZE * ROWS
-        NOS_MINES = 40
-    case '3':
-        WIDTH = 1008
-        COLS, ROWS = 24, 20
-        CELL_SIZE = WIDTH // COLS
-        HEIGHT = CELL_SIZE * ROWS
-        NOS_MINES = 99
-    case _:
-        WIDTH = 800
-        COLS, ROWS = 10, 8
-        CELL_SIZE = WIDTH // COLS
-        HEIGHT = CELL_SIZE * ROWS
-        NOS_MINES = 10
+# difficulty = input("Difficulty\n---------\n[1] Easy\n[2] Medium\n[3] Hard\n")
+# match difficulty:
+#     case '2':
+#         WIDTH = 900
+#         COLS, ROWS = 18, 14
+#         CELL_SIZE = WIDTH // COLS
+#         HEIGHT = CELL_SIZE * ROWS
+#         NOS_MINES = 40
+#     case '3':
+#         WIDTH = 1008
+#         COLS, ROWS = 24, 20
+#         CELL_SIZE = WIDTH // COLS
+#         HEIGHT = CELL_SIZE * ROWS
+#         NOS_MINES = 99
+#     case _:
+#         WIDTH = 800
+#         COLS, ROWS = 10, 8
+#         CELL_SIZE = WIDTH // COLS
+#         HEIGHT = CELL_SIZE * ROWS
+#         NOS_MINES = 10
 
 # Define colors
 WHITE = (255, 255, 255)
@@ -117,6 +117,32 @@ def draw_board(board, revealed, flagged):
                 colour = GRAY if (row + col) % 2 == 0 else DARK_GRAY
                 pygame.draw.rect(screen, colour, cell_rect)
 
+def flood_fill(row, col, board, revealed, flagged):
+    # if 0 < row < ROWS - 1 and 0 < col < COLS - 1 and board[row][col] != 0 and not revealed[row][col]:
+    if not revealed[row][col]:
+        if board[row][col] != 0 and not revealed[row][col]:
+            revealed[row][col] = True
+            flagged[row][col] = False
+            return
+        else:
+            revealed[row][col] = True
+            if row < ROWS - 1:
+                flood_fill(row + 1, col, board, revealed, flagged)
+            if row > 0:
+                flood_fill(row - 1, col, board, revealed, flagged)
+            if col < COLS - 1:
+                flood_fill(row, col + 1, board, revealed, flagged)
+            if col > 0:
+                flood_fill(row, col - 1, board, revealed, flagged)
+            if row < ROWS - 1 and col < COLS - 1:
+                flood_fill(row + 1, col + 1, board, revealed, flagged)
+            if row < ROWS - 1 and col > 0:
+                flood_fill(row + 1, col - 1, board, revealed, flagged)
+            if row > 0 and col < COLS - 1:
+                flood_fill(row - 1, col + 1, board, revealed, flagged)
+            if row > 0 and col > 0:
+                flood_fill(row - 1, col - 1, board, revealed, flagged)
+
 # Function to draw the replay button
 def draw_replay_button():
     font = pygame.font.Font(None, 50)
@@ -148,8 +174,9 @@ def main():
                         if not any([any(row) for row in revealed]):
                             board = initialise_board(row, col)
                         # Left click to reveal cell
-                        revealed[row][col] = True
-                        flagged[row][col] = False
+                        flood_fill(row, col, board, revealed, flagged)
+                        # revealed[row][col] = True
+                        # flagged[row][col] = False
                         if board[row][col] == -1:
                             print("Game Over!")
                             game_over = True
