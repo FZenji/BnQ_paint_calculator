@@ -20,24 +20,26 @@ GREEN = (56, 141, 60)
 PURPLE = (123, 31, 162)
 YELLOW = (252, 186, 3)
 ORANGE = (253, 142, 24)
-RED = (224, 22, 46)
+BRIGHT_RED = (224, 22, 46)
+RED = (210, 47, 47)
 DARK_BLUE = (56, 22, 224)
 AQUA = (29, 171, 140)
 
-# Initialize Pygame
+# Initialise Pygame
 pygame.init()
 
 # Create the game window
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Minesweeper")
 
-# Function to initialize the game board
-def initialize_board():
+# Function to initialise the game board
+def initialise_board(clicked_row, clicked_col):
     board = [[0 for _ in range(COLS)] for _ in range(ROWS)]
-    # Randomly place mines on the board
+    # Randomly place mines on the board, avoiding the clicked cell
     for _ in range(NOS_MINES):
         row, col = random.randint(0, ROWS - 1), random.randint(0, COLS - 1)
-        while board[row][col] == -1:
+        # Stops mines being placed in the same location
+        while board[row][col] == -1 or (row in range(clicked_row - 1, clicked_row + 2) and col in range(clicked_col - 1, clicked_col + 2)):
             row, col = random.randint(0, ROWS - 1), random.randint(0, COLS - 1)
         board[row][col] = -1
         # Increment the surrounding cells
@@ -61,17 +63,17 @@ def draw_board(board, revealed, flagged):
                         case '2':
                             font_colour = GREEN
                         case '3':
-                            font_colour = PURPLE
-                        case '4':
-                            font_colour = YELLOW
-                        case '5':
-                            font_colour = ORANGE
-                        case '5':
                             font_colour = RED
-                        case '5':
+                        case '4':
                             font_colour = DARK_BLUE
                         case '5':
+                            font_colour = ORANGE
+                        case '6':
                             font_colour = AQUA
+                        case '7':
+                            font_colour = BLACK
+                        case '8':
+                            font_colour = GRAY
                         case _:
                             font_colour = BLUE
                     text = font.render(number, True, font_colour)
@@ -92,8 +94,6 @@ def draw_board(board, revealed, flagged):
             else:
                 colour = GRAY if (row + col) % 2 == 0 else DARK_GRAY
                 pygame.draw.rect(screen, colour, cell_rect)
-                # if revealed[row][col]:
-                #     pygame.draw.rect(screen, WHITE, cell_rect)
 
 # Function to draw the replay button
 def draw_replay_button():
@@ -109,7 +109,7 @@ def main():
     game_over = False
     revealed = [[False for _ in range(COLS)] for _ in range(ROWS)]
     flagged = [[False for _ in range(COLS)] for _ in range(ROWS)]
-    board = initialize_board()
+    board = [[0 for _ in range(COLS)] for _ in range(ROWS)]
 
     while True:
         for event in pygame.event.get():
@@ -122,6 +122,10 @@ def main():
                 row = y // CELL_SIZE
                 if 0 <= row < ROWS and 0 <= col < COLS:
                     if event.button == 1 and not revealed[row][col]:
+                        # If it is the first click, generate the mines
+                        if not any([any(row) for row in revealed]):
+                            print("yes")
+                            board = initialise_board(row, col)
                         # Left click to reveal cell
                         revealed[row][col] = True
                         flagged[row][col] = False
@@ -134,7 +138,6 @@ def main():
 
         if not game_over:
             screen.fill(BLACK)
-            # draw_checkerboard()
             draw_board(board, revealed, flagged)
         else:
             # screen.fill(BLACK)
