@@ -10,6 +10,28 @@ HEIGHT = CELL_SIZE * ROWS
 NOS_MINES = 10
 BOARDER = 10
 
+# Set difficulty
+difficulty = input("Difficulty\n---------\n[1] Easy\n[2] Medium\n[3] Hard\n")
+match difficulty:
+    case '2':
+        WIDTH = 900
+        COLS, ROWS = 18, 14
+        CELL_SIZE = WIDTH // COLS
+        HEIGHT = CELL_SIZE * ROWS
+        NOS_MINES = 40
+    case '3':
+        WIDTH = 1008
+        COLS, ROWS = 24, 20
+        CELL_SIZE = WIDTH // COLS
+        HEIGHT = CELL_SIZE * ROWS
+        NOS_MINES = 99
+    case _:
+        WIDTH = 800
+        COLS, ROWS = 10, 8
+        CELL_SIZE = WIDTH // COLS
+        HEIGHT = CELL_SIZE * ROWS
+        NOS_MINES = 10
+
 # Define colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -124,7 +146,6 @@ def main():
                     if event.button == 1 and not revealed[row][col]:
                         # If it is the first click, generate the mines
                         if not any([any(row) for row in revealed]):
-                            print("yes")
                             board = initialise_board(row, col)
                         # Left click to reveal cell
                         revealed[row][col] = True
