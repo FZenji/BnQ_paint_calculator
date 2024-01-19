@@ -3,15 +3,26 @@ import sys
 import random
 
 # Define constants
-WIDTH, HEIGHT = 800, 600
-ROWS, COLS = 10, 10
+WIDTH = 800
+COLS, ROWS = 10, 8
 CELL_SIZE = WIDTH // COLS
+HEIGHT = CELL_SIZE * ROWS
+NOS_MINES = 10
+BOARDER = 10
 
 # Define colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GRAY = (192, 192, 192)
 DARK_GRAY = (169, 169, 169)
+BLUE = (25, 118, 210)
+GREEN = (56, 141, 60)
+PURPLE = (123, 31, 162)
+YELLOW = (252, 186, 3)
+ORANGE = (253, 142, 24)
+RED = (224, 22, 46)
+DARK_BLUE = (56, 22, 224)
+AQUA = (29, 171, 140)
 
 # Initialize Pygame
 pygame.init()
@@ -20,18 +31,11 @@ pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Minesweeper")
 
-# Function to draw the checkerboard pattern
-def draw_checkerboard():
-    for row in range(ROWS):
-        for col in range(COLS):
-            color = WHITE if (row + col) % 2 == 0 else DARK_GRAY
-            pygame.draw.rect(screen, color, (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE))
-
 # Function to initialize the game board
 def initialize_board():
     board = [[0 for _ in range(COLS)] for _ in range(ROWS)]
     # Randomly place mines on the board
-    for _ in range(15):
+    for _ in range(NOS_MINES):
         row, col = random.randint(0, ROWS - 1), random.randint(0, COLS - 1)
         while board[row][col] == -1:
             row, col = random.randint(0, ROWS - 1), random.randint(0, COLS - 1)
@@ -44,7 +48,7 @@ def initialize_board():
     return board
 
 # Function to draw the game board
-def draw_board(board, revealed):
+def draw_board(board, revealed, flagged):
     for row in range(ROWS):
         for col in range(COLS):
             cell_rect = pygame.Rect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
@@ -52,15 +56,44 @@ def draw_board(board, revealed):
                 pygame.draw.rect(screen, WHITE, cell_rect)
                 if board[row][col] > 0:
                     font = pygame.font.Font(None, 36)
-                    text = font.render(str(board[row][col]), True, BLACK)
+                    number = str(board[row][col])
+                    match number:
+                        case '2':
+                            font_colour = GREEN
+                        case '3':
+                            font_colour = PURPLE
+                        case '4':
+                            font_colour = YELLOW
+                        case '5':
+                            font_colour = ORANGE
+                        case '5':
+                            font_colour = RED
+                        case '5':
+                            font_colour = DARK_BLUE
+                        case '5':
+                            font_colour = AQUA
+                        case _:
+                            font_colour = BLUE
+                    text = font.render(number, True, font_colour)
                     text_rect = text.get_rect(center=cell_rect.center)
                     screen.blit(text, text_rect)
                 elif board[row][col] == -1:
-                    pygame.draw.circle(screen, BLACK, cell_rect.center, CELL_SIZE // 2 - 5)
+                    pygame.draw.circle(screen, BLACK, cell_rect.center, CELL_SIZE // 2 - BOARDER)
+            elif flagged[row][col]:
+                colour = GRAY if (row + col) % 2 == 0 else DARK_GRAY
+                pygame.draw.rect(screen, colour, cell_rect)
+                pygame.draw.polygon(screen, RED, [(col * CELL_SIZE + CELL_SIZE // 3 - 2, (row + 1) * CELL_SIZE - BOARDER), 
+                                                  (col * CELL_SIZE + CELL_SIZE // 3 - 2, row * CELL_SIZE + BOARDER), 
+                                                  (col * CELL_SIZE + CELL_SIZE // 3 + 2, row * CELL_SIZE + BOARDER),
+                                                  (col * CELL_SIZE + CELL_SIZE - BOARDER, row * CELL_SIZE + CELL_SIZE // 3),
+                                                  (col * CELL_SIZE + CELL_SIZE // 3 + 2, row * CELL_SIZE + 2 * (CELL_SIZE // 3)),
+                                                  (col * CELL_SIZE + CELL_SIZE // 3 + 2, (row + 1) * CELL_SIZE - 5)])
+
             else:
-                pygame.draw.rect(screen, GRAY, cell_rect)
-                if revealed[row][col]:
-                    pygame.draw.rect(screen, WHITE, cell_rect)
+                colour = GRAY if (row + col) % 2 == 0 else DARK_GRAY
+                pygame.draw.rect(screen, colour, cell_rect)
+                # if revealed[row][col]:
+                #     pygame.draw.rect(screen, WHITE, cell_rect)
 
 # Function to draw the replay button
 def draw_replay_button():
@@ -75,6 +108,7 @@ def main():
     clock = pygame.time.Clock()
     game_over = False
     revealed = [[False for _ in range(COLS)] for _ in range(ROWS)]
+    flagged = [[False for _ in range(COLS)] for _ in range(ROWS)]
     board = initialize_board()
 
     while True:
@@ -90,18 +124,21 @@ def main():
                     if event.button == 1 and not revealed[row][col]:
                         # Left click to reveal cell
                         revealed[row][col] = True
+                        flagged[row][col] = False
                         if board[row][col] == -1:
                             print("Game Over!")
                             game_over = True
                     elif event.button == 3 and not revealed[row][col]:
                         # Right click to flag/unflag cell
-                        revealed[row][col] = True if not revealed[row][col] else False
+                        flagged[row][col] = not flagged[row][col]
 
-        screen.fill(BLACK)
-        draw_checkerboard()
-        draw_board(board, revealed)
-        
-        if game_over:
+        if not game_over:
+            screen.fill(BLACK)
+            # draw_checkerboard()
+            draw_board(board, revealed, flagged)
+        else:
+            # screen.fill(BLACK)
+            # show_mines()
             draw_replay_button()
         
         pygame.display.flip()
