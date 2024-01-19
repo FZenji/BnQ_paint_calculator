@@ -1,0 +1,13 @@
+[
+  {
+    "person": {
+      "name": "Jane Doe",
+      "age": 27,
+      "address": {
+        "street": "123 Main St",
+        "city": "Los Angeles",
+        "zip": "90001"
+      }
+    }
+  }
+]
