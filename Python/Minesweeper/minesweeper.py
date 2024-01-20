@@ -57,11 +57,14 @@ LIGHT_BROWN = (229, 194, 159)
 LIGHT_GREEN = (142, 204, 57)
 LIGHTER_GREEN = (167, 217, 72)
 DARK_GREEN = (135, 175, 58)
+HOVER_LIGHT_GREEN = (185, 221, 119)
+HOVER_LIGHTER_GREEN = (191, 225, 125)
+# HOVER = (30, 30, 30)
 
 # Define Palettes
-GRAY_PALETTE = [GRAY, DARK_GRAY, BLACK]
-BROWN_PALETTE = [LIGHT_BROWN, BROWN, ORANGE]
-GREEN_PALETTE = [LIGHTER_GREEN, LIGHT_GREEN, DARK_GREEN]
+GRAY_PALETTE = [GRAY, DARK_GRAY]
+BROWN_PALETTE = [LIGHT_BROWN, BROWN]
+GREEN_PALETTE = [LIGHTER_GREEN, LIGHT_GREEN, HOVER_LIGHTER_GREEN, HOVER_LIGHT_GREEN]
 CHOSEN_PALETTES = [GREEN_PALETTE, BROWN_PALETTE]
 
 # Initialise Pygame
@@ -132,7 +135,8 @@ def draw_board(board, revealed, flagged, game_over=False):
                                                   (col * CELL_SIZE + CELL_SIZE // 3 + 2, (row + 1) * CELL_SIZE - 5)])
 
             else:
-                colour = CHOSEN_PALETTES[0][0] if (row + col) % 2 == 0 else CHOSEN_PALETTES[0][1]
+                hovered = cell_rect.collidepoint(pygame.mouse.get_pos())
+                colour = CHOSEN_PALETTES[0][3 if hovered else 0] if (row + col) % 2 == 0 else CHOSEN_PALETTES[0][3 if hovered else 1]
                 pygame.draw.rect(screen, colour, cell_rect)
 
 # def draw_boarder():
@@ -171,13 +175,11 @@ def flood_fill(row, col, board, revealed, flagged):
 def end_game(row, col, board, revealed, flagged):
     cell_rect = pygame.Rect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
     for i in range(SHAKE_DURATION * FRAMERATE):
-        # time.sleep(0.01)
         x_shake, y_shake = random.randint(-SHAKE_AMOUNT, SHAKE_AMOUNT), random.randint(-SHAKE_AMOUNT, SHAKE_AMOUNT)
         draw_board(board, revealed, flagged, game_over=True)
         pygame.draw.circle(screen, BLACK, cell_rect.move(x_shake, y_shake).center, CELL_SIZE // 2 - BOARDER)
         if i % 10 == 0:
             x_off, y_off = random.randint(-(CELL_SIZE // 4), CELL_SIZE // 4), random.randint(-(CELL_SIZE // 4), CELL_SIZE // 4)
-        # for _ in range(EXPLOSIONS):
         pygame.draw.circle(screen, ORANGE, cell_rect.move(x_off, y_off).center, CELL_SIZE // 4 - BOARDER)
         pygame.draw.circle(screen, RED, cell_rect.move(x_off, y_off).center, CELL_SIZE // 5 - BOARDER)
         pygame.display.flip()
