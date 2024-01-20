@@ -1,36 +1,42 @@
 import pygame
 import sys
 import random
+import math
+import time
 
 # Define constants
+FRAMERATE = 30
 WIDTH = 800
 COLS, ROWS = 10, 8
 CELL_SIZE = WIDTH // COLS
 HEIGHT = CELL_SIZE * ROWS
 NOS_MINES = 10
 BOARDER = 10
+BOARDER_THICKNESS = 4
+SHAKE_DURATION = 3
+SHAKE_AMOUNT = BOARDER // 3
 
 # Set difficulty
-# difficulty = input("Difficulty\n---------\n[1] Easy\n[2] Medium\n[3] Hard\n")
-# match difficulty:
-#     case '2':
-#         WIDTH = 900
-#         COLS, ROWS = 18, 14
-#         CELL_SIZE = WIDTH // COLS
-#         HEIGHT = CELL_SIZE * ROWS
-#         NOS_MINES = 40
-#     case '3':
-#         WIDTH = 1008
-#         COLS, ROWS = 24, 20
-#         CELL_SIZE = WIDTH // COLS
-#         HEIGHT = CELL_SIZE * ROWS
-#         NOS_MINES = 99
-#     case _:
-#         WIDTH = 800
-#         COLS, ROWS = 10, 8
-#         CELL_SIZE = WIDTH // COLS
-#         HEIGHT = CELL_SIZE * ROWS
-#         NOS_MINES = 10
+difficulty = input("Difficulty\n---------\n[1] Easy\n[2] Medium\n[3] Hard\n")
+match difficulty:
+    case '2':
+        WIDTH = 900
+        COLS, ROWS = 18, 14
+        CELL_SIZE = WIDTH // COLS
+        HEIGHT = CELL_SIZE * ROWS
+        NOS_MINES = 40
+    case '3':
+        WIDTH = 1008
+        COLS, ROWS = 24, 20
+        CELL_SIZE = WIDTH // COLS
+        HEIGHT = CELL_SIZE * ROWS
+        NOS_MINES = 99
+    case _:
+        WIDTH = 800
+        COLS, ROWS = 10, 8
+        CELL_SIZE = WIDTH // COLS
+        HEIGHT = CELL_SIZE * ROWS
+        NOS_MINES = 10
 
 # Define colors
 WHITE = (255, 255, 255)
@@ -50,11 +56,12 @@ BROWN = (215, 184, 153)
 LIGHT_BROWN = (229, 194, 159)
 LIGHT_GREEN = (142, 204, 57)
 LIGHTER_GREEN = (167, 217, 72)
+DARK_GREEN = (135, 175, 58)
 
 # Define Palettes
-GRAY_PALETTE = [GRAY, DARK_GRAY]
-BROWN_PALETTE = [LIGHT_BROWN, BROWN]
-GREEN_PALETTE = [LIGHTER_GREEN, LIGHT_GREEN]
+GRAY_PALETTE = [GRAY, DARK_GRAY, BLACK]
+BROWN_PALETTE = [LIGHT_BROWN, BROWN, ORANGE]
+GREEN_PALETTE = [LIGHTER_GREEN, LIGHT_GREEN, DARK_GREEN]
 CHOSEN_PALETTES = [GREEN_PALETTE, BROWN_PALETTE]
 
 # Initialise Pygame
@@ -82,7 +89,7 @@ def initialise_board(clicked_row, clicked_col):
     return board
 
 # Function to draw the game board
-def draw_board(board, revealed, flagged):
+def draw_board(board, revealed, flagged, game_over=False):
     for row in range(ROWS):
         for col in range(COLS):
             cell_rect = pygame.Rect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
@@ -112,7 +119,7 @@ def draw_board(board, revealed, flagged):
                     text = font.render(number, True, font_colour)
                     text_rect = text.get_rect(center=cell_rect.center)
                     screen.blit(text, text_rect)
-                elif board[row][col] == -1:
+                elif board[row][col] == -1 and not game_over:
                     pygame.draw.circle(screen, BLACK, cell_rect.center, CELL_SIZE // 2 - BOARDER)
             elif flagged[row][col]:
                 colour = CHOSEN_PALETTES[0][0] if (row + col) % 2 == 0 else CHOSEN_PALETTES[0][1]
@@ -128,10 +135,16 @@ def draw_board(board, revealed, flagged):
                 colour = CHOSEN_PALETTES[0][0] if (row + col) % 2 == 0 else CHOSEN_PALETTES[0][1]
                 pygame.draw.rect(screen, colour, cell_rect)
 
+# def draw_boarder():
+#     for i in range(1, ROWS + 1):
+#         pygame.draw.line(screen, CHOSEN_PALETTES[0][2], (0, i * CELL_SIZE), (WIDTH, i * CELL_SIZE), BOARDER_THICKNESS)
+#     for j in range(1, COLS + 1):
+#         pygame.draw.line(screen, CHOSEN_PALETTES[0][2], (j * CELL_SIZE, 0), (j * CELL_SIZE, HEIGHT), BOARDER_THICKNESS)
+
 def flood_fill(row, col, board, revealed, flagged):
     # if 0 < row < ROWS - 1 and 0 < col < COLS - 1 and board[row][col] != 0 and not revealed[row][col]:
     if not revealed[row][col]:
-        if board[row][col] != 0 and not revealed[row][col]:
+        if board[row][col] != 0:
             revealed[row][col] = True
             flagged[row][col] = False
             return
@@ -153,6 +166,26 @@ def flood_fill(row, col, board, revealed, flagged):
                 flood_fill(row - 1, col + 1, board, revealed, flagged)
             if row > 0 and col > 0:
                 flood_fill(row - 1, col - 1, board, revealed, flagged)
+
+# Function to play the death animation
+def end_game(row, col, board, revealed, flagged):
+    cell_rect = pygame.Rect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+    for _ in range(SHAKE_DURATION * FRAMERATE):
+        x_shake, y_shake = random.randint(-SHAKE_AMOUNT, SHAKE_AMOUNT), random.randint(-SHAKE_AMOUNT, SHAKE_AMOUNT)
+        draw_board(board, revealed, flagged, game_over=True)
+        pygame.draw.circle(screen, BLACK, cell_rect.move(x_shake, y_shake).center, CELL_SIZE // 2 - BOARDER)
+        pygame.display.flip()
+
+    cell_rect = pygame.Rect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+    max_radius = max([
+            math.dist(cell_rect.center, (WIDTH, HEIGHT)), 
+            math.dist(cell_rect.center, (0, HEIGHT)),
+            math.dist(cell_rect.center, (0, 0)),
+            math.dist(cell_rect.center, (WIDTH, 0))
+        ])
+    for radius in range(int(CELL_SIZE // 2 - BOARDER), math.ceil(max_radius)):
+        pygame.draw.circle(screen, BLACK, cell_rect.center, radius)
+        pygame.display.flip()
 
 # Function to draw the replay button
 def draw_replay_button():
@@ -184,27 +217,28 @@ def main():
                         # If it is the first click, generate the mines
                         if not any([any(row) for row in revealed]):
                             board = initialise_board(row, col)
-                        # Left click to reveal cell
+                        # Left click to reveal cell, use flood fill recursion
                         flood_fill(row, col, board, revealed, flagged)
-                        # revealed[row][col] = True
-                        # flagged[row][col] = False
                         if board[row][col] == -1:
                             print("Game Over!")
+                            end_game(row, col, board, revealed, flagged)
                             game_over = True
                     elif event.button == 3 and not revealed[row][col]:
                         # Right click to flag/unflag cell
                         flagged[row][col] = not flagged[row][col]
+                    # Check if the game is won
+                    if [cell for row in revealed for cell in row].count(False) == NOS_MINES and not game_over:
+                        print("Game Won!")
 
         if not game_over:
             screen.fill(BLACK)
             draw_board(board, revealed, flagged)
         else:
-            # screen.fill(BLACK)
-            # show_mines()
+            screen.fill(BLACK)
             draw_replay_button()
         
         pygame.display.flip()
-        clock.tick(30)
+        clock.tick(FRAMERATE)
 
 # Run the game
 if __name__ == "__main__":
