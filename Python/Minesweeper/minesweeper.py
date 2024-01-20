@@ -4,6 +4,9 @@ import random
 import math
 import time
 
+# Initialise Pygame
+pygame.init()
+
 # Define constants
 FRAMERATE = 30
 WIDTH = 800
@@ -15,6 +18,8 @@ BOARDER = 10
 BOARDER_THICKNESS = 4
 SHAKE_DURATION = 4
 SHAKE_AMOUNT = BOARDER // 3
+TITLE_FONT = pygame.font.Font('Python/Minesweeper/vgasys.ttf', 50)
+FONT = pygame.font.Font(None, 36)
 
 # Set difficulty
 # difficulty = input("Difficulty\n---------\n[1] Easy\n[2] Medium\n[3] Hard\n")
@@ -67,12 +72,9 @@ BROWN_PALETTE = [LIGHT_BROWN, BROWN]
 GREEN_PALETTE = [LIGHTER_GREEN, LIGHT_GREEN, HOVER_LIGHTER_GREEN, HOVER_LIGHT_GREEN]
 CHOSEN_PALETTES = [GREEN_PALETTE, BROWN_PALETTE]
 
-# Initialise Pygame
-pygame.init()
-
 # Create the game window
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Minesweeper")
+pygame.display.set_caption("Minesweeper Reloaded")
 
 # Function to initialise the game board
 def initialise_board(clicked_row, clicked_col):
@@ -100,7 +102,6 @@ def draw_board(board, revealed, flagged, game_over=False):
                 colour = CHOSEN_PALETTES[1][0] if (row + col) % 2 == 0 else CHOSEN_PALETTES[1][1]
                 pygame.draw.rect(screen, colour, cell_rect)
                 if board[row][col] > 0:
-                    font = pygame.font.Font(None, 36)
                     number = str(board[row][col])
                     match number:
                         case '2':
@@ -119,7 +120,7 @@ def draw_board(board, revealed, flagged, game_over=False):
                             font_colour = GRAY
                         case _:
                             font_colour = BLUE
-                    text = font.render(number, True, font_colour)
+                    text = FONT.render(number, True, font_colour)
                     text_rect = text.get_rect(center=cell_rect.center)
                     screen.blit(text, text_rect)
                 elif board[row][col] == -1 and not game_over:
@@ -175,6 +176,7 @@ def flood_fill(row, col, board, revealed, flagged):
 def end_game(row, col, board, revealed, flagged):
     cell_rect = pygame.Rect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
     for i in range(SHAKE_DURATION * FRAMERATE):
+        time.sleep(0.01)
         x_shake, y_shake = random.randint(-SHAKE_AMOUNT, SHAKE_AMOUNT), random.randint(-SHAKE_AMOUNT, SHAKE_AMOUNT)
         draw_board(board, revealed, flagged, game_over=True)
         pygame.draw.circle(screen, BLACK, cell_rect.move(x_shake, y_shake).center, CELL_SIZE // 2 - BOARDER)
@@ -195,18 +197,48 @@ def end_game(row, col, board, revealed, flagged):
         pygame.draw.circle(screen, BLACK, cell_rect.center, radius)
         pygame.display.flip()
 
-# Function to draw the replay button
-def draw_replay_button():
-    font = pygame.font.Font(None, 50)
-    replay_text = font.render("Replay", True, WHITE)
-    replay_rect = replay_text.get_rect(center=(WIDTH // 2, HEIGHT - 50))
-    pygame.draw.rect(screen, BLACK, replay_rect)
-    screen.blit(replay_text, replay_rect)
+def start_game():
+    revealed = [[False for _ in range(COLS)] for _ in range(ROWS)]
+    flagged = [[False for _ in range(COLS)] for _ in range(ROWS)]
+    board = [[0 for _ in range(COLS)] for _ in range(ROWS)]
+    for radius in range(math.ceil(math.dist((0, 0), ((WIDTH // 2, HEIGHT // 2)))), 0, -1):
+        draw_board(board, revealed, flagged)
+        pygame.draw.circle(screen, BLACK, (WIDTH // 2, HEIGHT // 2), radius)
+        pygame.display.flip()
+    return revealed, flagged, board
+
+def show_leaderboard():
+    pass
+
+# Function to draw the main menu
+def draw_menu():
+    title_text = TITLE_FONT.render("Minesweeper Reloaded", True, WHITE)
+    title_rect = title_text.get_rect(center=(WIDTH // 2, 75))
+
+    play_text = TITLE_FONT.render("Play", True, WHITE)
+    play_rect = play_text.get_rect(center=(WIDTH // 2, 250))
+    hovered = play_rect.inflate(250, 100).collidepoint(pygame.mouse.get_pos())
+    if hovered:
+        pygame.draw.rect(screen, (100, 100, 100), play_rect.inflate(250, 100))
+    pygame.draw.rect(screen, ((225, 225, 225) if hovered else (255, 255, 255)), play_rect.inflate(250, 100), 4)
+
+    leaderboard_text = TITLE_FONT.render("Leaderboard", True, WHITE)
+    leaderboard_rect = leaderboard_text.get_rect(center=(WIDTH // 2, 500))
+    hovered = play_rect.move(0, 250).inflate(250, 100).collidepoint(pygame.mouse.get_pos())
+    if hovered:
+        pygame.draw.rect(screen, (100, 100, 100), play_rect.move(0, 250).inflate(250, 100))
+    pygame.draw.rect(screen, ((225, 225, 225) if hovered else (255, 255, 255)), play_rect.move(0, 250).inflate(250, 100), 4)
+
+    screen.blit(title_text, title_rect)
+    screen.blit(play_text, play_rect)
+    screen.blit(leaderboard_text, leaderboard_rect)
+
+    return play_rect.inflate(250, 100), play_rect.move(0, 250).inflate(250, 100)
 
 # Main game loop
 def main():
     clock = pygame.time.Clock()
-    game_over = False
+    game_over = True
     revealed = [[False for _ in range(COLS)] for _ in range(ROWS)]
     flagged = [[False for _ in range(COLS)] for _ in range(ROWS)]
     board = [[0 for _ in range(COLS)] for _ in range(ROWS)]
@@ -218,32 +250,42 @@ def main():
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = event.pos
-                col = x // CELL_SIZE
-                row = y // CELL_SIZE
-                if 0 <= row < ROWS and 0 <= col < COLS:
-                    if event.button == 1 and not revealed[row][col]:
-                        # If it is the first click, generate the mines
-                        if not any([any(row) for row in revealed]):
-                            board = initialise_board(row, col)
-                        # Left click to reveal cell, use flood fill recursion
-                        flood_fill(row, col, board, revealed, flagged)
-                        if board[row][col] == -1:
-                            print("Game Over!")
-                            end_game(row, col, board, revealed, flagged)
-                            game_over = True
-                    elif event.button == 3 and not revealed[row][col]:
-                        # Right click to flag/unflag cell
-                        flagged[row][col] = not flagged[row][col]
-                    # Check if the game is won
-                    if [cell for row in revealed for cell in row].count(False) == NOS_MINES and not game_over:
-                        print("Game Won!")
+                if not game_over:
+                    col = x // CELL_SIZE
+                    row = y // CELL_SIZE
+                    if 0 <= row < ROWS and 0 <= col < COLS:
+                        if event.button == 1 and not revealed[row][col]:
+                            # If it is the first click, generate the mines
+                            if not any([any(row) for row in revealed]):
+                                board = initialise_board(row, col)
+                            # Left click to reveal cell, use flood fill recursion
+                            flood_fill(row, col, board, revealed, flagged)
+                            if board[row][col] == -1:
+                                print("Game Over!")
+                                end_game(row, col, board, revealed, flagged)
+                                game_over = True
+                        elif event.button == 3 and not revealed[row][col]:
+                            # Right click to flag/unflag cell
+                            flagged[row][col] = not flagged[row][col]
+                        # Check if the game is won
+                        if [cell for row in revealed for cell in row].count(False) == NOS_MINES and not game_over:
+                            print("Game Won!")
+                else:
+                    if play_rect.collidepoint(x, y):
+                        game_over = False
+                        revealed, flagged, board = start_game()
+                    elif leaderboard_rect.collidepoint(x, y):
+                        show_leaderboard()
+
 
         if not game_over:
             screen.fill(BLACK)
             draw_board(board, revealed, flagged)
         else:
             screen.fill(BLACK)
-            draw_replay_button()
+            # draw_replay_button()
+            play_rect, leaderboard_rect = draw_menu()
+            # print("hi")
         
         pygame.display.flip()
         clock.tick(FRAMERATE)
