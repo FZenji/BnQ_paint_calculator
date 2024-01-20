@@ -46,6 +46,16 @@ BRIGHT_RED = (224, 22, 46)
 RED = (210, 47, 47)
 DARK_BLUE = (56, 22, 224)
 AQUA = (29, 171, 140)
+BROWN = (215, 184, 153)
+LIGHT_BROWN = (229, 194, 159)
+LIGHT_GREEN = (142, 204, 57)
+LIGHTER_GREEN = (167, 217, 72)
+
+# Define Palettes
+GRAY_PALETTE = [GRAY, DARK_GRAY]
+BROWN_PALETTE = [LIGHT_BROWN, BROWN]
+GREEN_PALETTE = [LIGHTER_GREEN, LIGHT_GREEN]
+CHOSEN_PALETTES = [GREEN_PALETTE, BROWN_PALETTE]
 
 # Initialise Pygame
 pygame.init()
@@ -77,7 +87,8 @@ def draw_board(board, revealed, flagged):
         for col in range(COLS):
             cell_rect = pygame.Rect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
             if revealed[row][col]:
-                pygame.draw.rect(screen, WHITE, cell_rect)
+                colour = CHOSEN_PALETTES[1][0] if (row + col) % 2 == 0 else CHOSEN_PALETTES[1][1]
+                pygame.draw.rect(screen, colour, cell_rect)
                 if board[row][col] > 0:
                     font = pygame.font.Font(None, 36)
                     number = str(board[row][col])
@@ -104,7 +115,7 @@ def draw_board(board, revealed, flagged):
                 elif board[row][col] == -1:
                     pygame.draw.circle(screen, BLACK, cell_rect.center, CELL_SIZE // 2 - BOARDER)
             elif flagged[row][col]:
-                colour = GRAY if (row + col) % 2 == 0 else DARK_GRAY
+                colour = CHOSEN_PALETTES[0][0] if (row + col) % 2 == 0 else CHOSEN_PALETTES[0][1]
                 pygame.draw.rect(screen, colour, cell_rect)
                 pygame.draw.polygon(screen, RED, [(col * CELL_SIZE + CELL_SIZE // 3 - 2, (row + 1) * CELL_SIZE - BOARDER), 
                                                   (col * CELL_SIZE + CELL_SIZE // 3 - 2, row * CELL_SIZE + BOARDER), 
@@ -114,7 +125,7 @@ def draw_board(board, revealed, flagged):
                                                   (col * CELL_SIZE + CELL_SIZE // 3 + 2, (row + 1) * CELL_SIZE - 5)])
 
             else:
-                colour = GRAY if (row + col) % 2 == 0 else DARK_GRAY
+                colour = CHOSEN_PALETTES[0][0] if (row + col) % 2 == 0 else CHOSEN_PALETTES[0][1]
                 pygame.draw.rect(screen, colour, cell_rect)
 
 def flood_fill(row, col, board, revealed, flagged):
