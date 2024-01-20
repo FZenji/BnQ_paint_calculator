@@ -13,30 +13,30 @@ HEIGHT = CELL_SIZE * ROWS
 NOS_MINES = 10
 BOARDER = 10
 BOARDER_THICKNESS = 4
-SHAKE_DURATION = 3
+SHAKE_DURATION = 4
 SHAKE_AMOUNT = BOARDER // 3
 
 # Set difficulty
-difficulty = input("Difficulty\n---------\n[1] Easy\n[2] Medium\n[3] Hard\n")
-match difficulty:
-    case '2':
-        WIDTH = 900
-        COLS, ROWS = 18, 14
-        CELL_SIZE = WIDTH // COLS
-        HEIGHT = CELL_SIZE * ROWS
-        NOS_MINES = 40
-    case '3':
-        WIDTH = 1008
-        COLS, ROWS = 24, 20
-        CELL_SIZE = WIDTH // COLS
-        HEIGHT = CELL_SIZE * ROWS
-        NOS_MINES = 99
-    case _:
-        WIDTH = 800
-        COLS, ROWS = 10, 8
-        CELL_SIZE = WIDTH // COLS
-        HEIGHT = CELL_SIZE * ROWS
-        NOS_MINES = 10
+# difficulty = input("Difficulty\n---------\n[1] Easy\n[2] Medium\n[3] Hard\n")
+# match difficulty:
+#     case '2':
+#         WIDTH = 900
+#         COLS, ROWS = 18, 14
+#         CELL_SIZE = WIDTH // COLS
+#         HEIGHT = CELL_SIZE * ROWS
+#         NOS_MINES = 40
+#     case '3':
+#         WIDTH = 1008
+#         COLS, ROWS = 24, 20
+#         CELL_SIZE = WIDTH // COLS
+#         HEIGHT = CELL_SIZE * ROWS
+#         NOS_MINES = 99
+#     case _:
+#         WIDTH = 800
+#         COLS, ROWS = 10, 8
+#         CELL_SIZE = WIDTH // COLS
+#         HEIGHT = CELL_SIZE * ROWS
+#         NOS_MINES = 10
 
 # Define colors
 WHITE = (255, 255, 255)
@@ -167,13 +167,19 @@ def flood_fill(row, col, board, revealed, flagged):
             if row > 0 and col > 0:
                 flood_fill(row - 1, col - 1, board, revealed, flagged)
 
-# Function to play the death animation
+# Function to play the explosion animation
 def end_game(row, col, board, revealed, flagged):
     cell_rect = pygame.Rect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-    for _ in range(SHAKE_DURATION * FRAMERATE):
+    for i in range(SHAKE_DURATION * FRAMERATE):
+        # time.sleep(0.01)
         x_shake, y_shake = random.randint(-SHAKE_AMOUNT, SHAKE_AMOUNT), random.randint(-SHAKE_AMOUNT, SHAKE_AMOUNT)
         draw_board(board, revealed, flagged, game_over=True)
         pygame.draw.circle(screen, BLACK, cell_rect.move(x_shake, y_shake).center, CELL_SIZE // 2 - BOARDER)
+        if i % 10 == 0:
+            x_off, y_off = random.randint(-(CELL_SIZE // 4), CELL_SIZE // 4), random.randint(-(CELL_SIZE // 4), CELL_SIZE // 4)
+        # for _ in range(EXPLOSIONS):
+        pygame.draw.circle(screen, ORANGE, cell_rect.move(x_off, y_off).center, CELL_SIZE // 4 - BOARDER)
+        pygame.draw.circle(screen, RED, cell_rect.move(x_off, y_off).center, CELL_SIZE // 5 - BOARDER)
         pygame.display.flip()
 
     cell_rect = pygame.Rect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
