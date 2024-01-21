@@ -23,6 +23,7 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GRAY = (192, 192, 192)
 DARK_GRAY = (169, 169, 169)
+
 BLUE = (25, 118, 210)
 GREEN = (56, 141, 60)
 PURPLE = (123, 31, 162)
@@ -32,19 +33,24 @@ BRIGHT_RED = (224, 22, 46)
 RED = (210, 47, 47)
 DARK_BLUE = (56, 22, 224)
 AQUA = (29, 171, 140)
+
 BROWN = (215, 184, 153)
 LIGHT_BROWN = (229, 194, 159)
 LIGHT_GREEN = (142, 204, 57)
 LIGHTER_GREEN = (167, 217, 72)
 DARK_GREEN = (135, 175, 58)
+DARKER_GREEN = (60, 79, 22)
+LIGHT_BLUE = (74, 192, 253)
+LIGHTER_BLUE = (125, 211, 255)
 HOVER_LIGHT_GREEN = (185, 221, 119)
 HOVER_LIGHTER_GREEN = (191, 225, 125)
 
 # Define Palettes
 GRAY_PALETTE = [GRAY, DARK_GRAY]
-BROWN_PALETTE = [LIGHT_BROWN, BROWN]
+BROWN_PALETTE = [LIGHT_BROWN, BROWN, LIGHT_BROWN, BROWN]
 GREEN_PALETTE = [LIGHTER_GREEN, LIGHT_GREEN, HOVER_LIGHTER_GREEN, HOVER_LIGHT_GREEN]
-CHOSEN_PALETTES = [GREEN_PALETTE, BROWN_PALETTE]
+BLUE_PALETTE = [LIGHT_BLUE, LIGHTER_BLUE]
+CHOSEN_PALETTES = [GREEN_PALETTE, BROWN_PALETTE, DARK_GREEN, LIGHT_BLUE]
 
 # Create the game window
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -68,7 +74,7 @@ def initialise_board(clicked_row, clicked_col):
     return board
 
 # Function to draw the game board
-def draw_board(board, revealed, flagged, game_over=False):
+def draw_board(board, revealed, flagged, game_over=False, game_won=False):
     for row in range(ROWS):
         for col in range(COLS):
             cell_rect = pygame.Rect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
@@ -98,7 +104,7 @@ def draw_board(board, revealed, flagged, game_over=False):
                     text_rect = text.get_rect(center=cell_rect.center)
                     screen.blit(text, text_rect)
                 elif board[row][col] == -1 and not game_over:
-                    pygame.draw.circle(screen, BLACK, cell_rect.center, CELL_SIZE // 2 - BOARDER)
+                    pygame.draw.circle(screen, CHOSEN_PALETTES[2] if game_won else BLACK, cell_rect.center, CELL_SIZE // 2 - BOARDER)
             elif flagged[row][col]:
                 colour = CHOSEN_PALETTES[0][0] if (row + col) % 2 == 0 else CHOSEN_PALETTES[0][1]
                 pygame.draw.rect(screen, colour, cell_rect)
@@ -111,11 +117,10 @@ def draw_board(board, revealed, flagged, game_over=False):
 
             else:
                 hovered = cell_rect.collidepoint(pygame.mouse.get_pos())
-                colour = CHOSEN_PALETTES[0][3 if hovered else 0] if (row + col) % 2 == 0 else CHOSEN_PALETTES[0][3 if hovered else 1]
+                colour = CHOSEN_PALETTES[0][2 if hovered else 0] if (row + col) % 2 == 0 else CHOSEN_PALETTES[0][3 if hovered else 1]
                 pygame.draw.rect(screen, colour, cell_rect)
 
 def flood_fill(row, col, board, revealed, flagged):
-    # if 0 < row < ROWS - 1 and 0 < col < COLS - 1 and board[row][col] != 0 and not revealed[row][col]:
     if not revealed[row][col]:
         if board[row][col] != 0:
             revealed[row][col] = True
@@ -164,6 +169,31 @@ def end_game(row, col, board, revealed, flagged):
     for radius in range(int(CELL_SIZE // 2 - BOARDER), math.ceil(max_radius)):
         pygame.draw.circle(screen, BLACK, cell_rect.center, radius)
         pygame.display.flip()
+
+def win_game(board, revealed, flagged):
+    for row in range(ROWS):
+        for col in range(COLS):
+            if board[row][col] != -1:
+                board[row][col] = 0
+                flagged[row][col] = False
+    nos_cells = ROWS * COLS
+    max_radius = CELL_SIZE // 2 - BOARDER
+    for row in range(ROWS):
+        for col in range(COLS):
+            cell_rect = pygame.Rect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+            revealed[row][col] = True
+            draw_board(board, revealed, flagged, game_won=True)
+            if board[row][col] == -1:
+                pygame.draw.circle(screen, BLACK, cell_rect.center, max_radius)
+                for radius in range(max_radius):
+                    time.sleep(0.5/max_radius)
+                    pygame.draw.circle(screen, CHOSEN_PALETTES[2], cell_rect.center, radius)
+                    pygame.display.flip()
+            pygame.display.flip()
+    for y in range(HEIGHT):
+        pygame.draw.rect(screen, CHOSEN_PALETTES[3], pygame.Rect(0, 0, WIDTH, y))
+        pygame.display.flip()
+
 
 def start_game():
     revealed = [[False for _ in range(COLS)] for _ in range(ROWS)]
@@ -311,6 +341,7 @@ def main():
                             print("Game Won!")
                             game_over = True
                             game_won = True
+                            win_game(board, revealed, flagged)
                 elif main_menu:
                     if play_rect.collidepoint(x, y):
                         difficulty_select = True
@@ -363,7 +394,7 @@ def main():
             screen.fill(BLACK)
             retry = draw_game_lost()
         elif game_won:
-            screen.fill(BLACK)
+            screen.fill(LIGHT_BLUE)
             again = draw_game_won()
         else:
             print("NOOOO")
