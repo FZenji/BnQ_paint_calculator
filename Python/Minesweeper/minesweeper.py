@@ -235,13 +235,33 @@ def draw_difficulty():
 
     return easy_rect.inflate(250, 100), medium_rect.inflate(250, 100), hard_rect.inflate(250, 100)
 
+def draw_game_lost():
+    title_text = TITLE_FONT.render("Game Over!", True, WHITE)
+    title_rect = title_text.get_rect(center=(WIDTH // 2, 75))
+
+    retry_text = TITLE_FONT.render("Retry", True, WHITE)
+    retry_rect = retry_text.get_rect(center=(WIDTH // 2, 250))
+    hovered = retry_rect.inflate(250, 100).collidepoint(pygame.mouse.get_pos())
+    if hovered:
+        pygame.draw.rect(screen, (100, 100, 100), retry_rect.inflate(250, 100))
+    pygame.draw.rect(screen, ((225, 225, 225) if hovered else (255, 255, 255)), retry_rect.inflate(250, 100), 4)
+
+    screen.blit(title_text, title_rect)
+    screen.blit(retry_text, retry_rect)
+    
+    return retry_rect.inflate(250, 100)
+
+def draw_game_won():
+    pass
+
 # Main game loop
 def main():
     clock = pygame.time.Clock()
     game_over = True
     main_menu = True
     difficulty_select = False
-    results = False
+    game_won = False
+    game_lost = False
     setup = False
 
     # Globals
@@ -271,8 +291,8 @@ def main():
                             if board[row][col] == -1:
                                 print("Game Over!")
                                 game_over = True
-                                # results = True
-                                main_menu = True
+                                game_lost = True
+                                # main_menu = True
                                 end_game(row, col, board, revealed, flagged)
                         elif event.button == 3 and not revealed[row][col]:
                             # Right click to flag/unflag cell
@@ -280,12 +300,12 @@ def main():
                         # Check if the game is won
                         if [cell for row in revealed for cell in row].count(False) == NOS_MINES and not game_over:
                             print("Game Won!")
+                            game_over = True
+                            game_won = True
                 elif main_menu:
                     if play_rect.collidepoint(x, y):
                         difficulty_select = True
                         main_menu = False
-                        # game_over = False
-                        # revealed, flagged, board = start_game()
                     elif leaderboard_rect.collidepoint(x, y):
                         show_leaderboard()
                 elif difficulty_select:
@@ -309,7 +329,7 @@ def main():
                         game_over = False
                         difficulty_select = False
                         revealed, flagged, board = start_game()
-                elif results:
+                elif game_lost:
                     pass
                 else:
                     print("Nuar")
@@ -324,9 +344,12 @@ def main():
         elif difficulty_select:
             screen.fill(BLACK)
             easy, medium, hard = draw_difficulty()
-        elif results:
+        elif game_lost:
             screen.fill(BLACK)
-            pass
+            retry = draw_game_lost()
+        elif game_won:
+            screen.fill(BLACK)
+            retry = draw_game_won()
         else:
             print("NOOOO")
         
