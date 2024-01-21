@@ -119,6 +119,23 @@ def draw_board(board, revealed, flagged, game_over=False, game_won=False):
                 hovered = cell_rect.collidepoint(pygame.mouse.get_pos())
                 colour = CHOSEN_PALETTES[0][2 if hovered else 0] if (row + col) % 2 == 0 else CHOSEN_PALETTES[0][3 if hovered else 1]
                 pygame.draw.rect(screen, colour, cell_rect)
+    draw_hud(flagged)
+
+def draw_hud(flagged):
+    flag_size = 30
+    offset_y = (HEIGHT - ROWS * CELL_SIZE) // 2 - (flag_size // 2) + 5
+    offset_x = 50
+    nos_flags = [i for row in flagged for i in row].count(True)
+    flag_text = FONT.render(f"{NOS_MINES - nos_flags}", True, WHITE)
+    flag_rect = flag_text.get_rect(center=(WIDTH // 3, ROWS * CELL_SIZE + (HEIGHT - ROWS * CELL_SIZE) // 2))
+    pygame.draw.polygon(screen, RED, [(WIDTH // 3 - offset_x + flag_size // 3 - 2, HEIGHT - offset_y), 
+                                      (WIDTH // 3 - offset_x + flag_size // 3 - 2, HEIGHT - offset_y - flag_size), 
+                                      (WIDTH // 3 - offset_x + flag_size // 3 + 2, HEIGHT - offset_y - flag_size),
+                                      (WIDTH // 3 - offset_x + flag_size, HEIGHT - offset_y - flag_size + flag_size // 3),
+                                      (WIDTH // 3 - offset_x + flag_size // 3 + 2, HEIGHT - offset_y - flag_size + 2 * (flag_size // 3)),
+                                      (WIDTH // 3 - offset_x + flag_size // 3 + 2, HEIGHT - offset_y + 5)])
+
+    screen.blit(flag_text, flag_rect)
 
 def flood_fill(row, col, board, revealed, flagged):
     if not revealed[row][col]:
@@ -128,6 +145,7 @@ def flood_fill(row, col, board, revealed, flagged):
             return
         else:
             revealed[row][col] = True
+            flagged[row][col] = False
             if row < ROWS - 1:
                 flood_fill(row + 1, col, board, revealed, flagged)
             if row > 0:
@@ -335,7 +353,10 @@ def main():
                                 end_game(row, col, board, revealed, flagged)
                         elif event.button == 3 and not revealed[row][col]:
                             # Right click to flag/unflag cell
-                            flagged[row][col] = not flagged[row][col]
+                            if flagged[row][col]:
+                                flagged[row][col] = not flagged[row][col]
+                            elif not flagged[row][col] and [i for row in flagged for i in row].count(True) < NOS_MINES:
+                                flagged[row][col] = not flagged[row][col]
                         # Check if the game is won
                         if [cell for row in revealed for cell in row].count(False) == NOS_MINES and not game_over:
                             print("Game Won!")
