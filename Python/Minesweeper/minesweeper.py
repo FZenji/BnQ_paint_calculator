@@ -252,7 +252,20 @@ def draw_game_lost():
     return retry_rect.inflate(250, 100)
 
 def draw_game_won():
-    pass
+    title_text = TITLE_FONT.render("Congratulations!", True, WHITE)
+    title_rect = title_text.get_rect(center=(WIDTH // 2, 75))
+
+    again_text = TITLE_FONT.render("Play Again", True, WHITE)
+    again_rect = again_text.get_rect(center=(WIDTH // 2, 750))
+    hovered = again_rect.inflate(250, 100).collidepoint(pygame.mouse.get_pos())
+    if hovered:
+        pygame.draw.rect(screen, (100, 100, 100), again_rect.inflate(250, 100))
+    pygame.draw.rect(screen, ((225, 225, 225) if hovered else (255, 255, 255)), again_rect.inflate(250, 100), 4)
+
+    screen.blit(title_text, title_rect)
+    screen.blit(again_text, again_rect)
+    
+    return again_rect.inflate(250, 100)
 
 # Main game loop
 def main():
@@ -266,10 +279,6 @@ def main():
 
     # Globals
     global COLS, ROWS, CELL_SIZE, NOS_MINES
-
-    # revealed = [[False for _ in range(COLS)] for _ in range(ROWS)]
-    # flagged = [[False for _ in range(COLS)] for _ in range(ROWS)]
-    # board = [[0 for _ in range(COLS)] for _ in range(ROWS)]
 
     while True:
         for event in pygame.event.get():
@@ -330,7 +339,13 @@ def main():
                         difficulty_select = False
                         revealed, flagged, board = start_game()
                 elif game_lost:
-                    pass
+                    if retry.collidepoint(x, y):
+                        game_lost = False
+                        main_menu = True
+                elif game_won:
+                    if again.collidepoint(x, y):
+                        game_won = False
+                        main_menu = True
                 else:
                     print("Nuar")
                 
@@ -349,7 +364,7 @@ def main():
             retry = draw_game_lost()
         elif game_won:
             screen.fill(BLACK)
-            retry = draw_game_won()
+            again = draw_game_won()
         else:
             print("NOOOO")
         
