@@ -443,10 +443,8 @@ def main():
                             # Left click to reveal cell, use flood fill recursion
                             flood_fill(row, col, board, revealed, flagged)
                             if board[row][col] == -1:
-                                print("Game Over!")
                                 game_over = True
                                 game_lost = True
-                                # main_menu = True
                                 end_game(row, col, board, revealed, flagged)
                         elif event.button == 3 and not revealed[row][col]:
                             # Right click to flag/unflag cell
@@ -459,7 +457,6 @@ def main():
                             end_time = pygame.time.get_ticks()
                             total_time = end_time - start_time
                             write_to_json(total_time)
-                            print("Game Won!")
                             game_over = True
                             game_won = True
                             win_game(board, revealed, flagged, end_time)
