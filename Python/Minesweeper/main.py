@@ -485,7 +485,7 @@ async def main():
                     if easy.collidepoint(x, y):
                         COLS, ROWS = 10, 8
                         CELL_SIZE = WIDTH // COLS
-                        NOS_MINES = 1
+                        NOS_MINES = 10
                         DIFFICULTY = "easy"
                         setup = True
                     elif medium.collidepoint(x, y):

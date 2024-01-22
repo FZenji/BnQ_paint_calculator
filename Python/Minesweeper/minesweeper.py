@@ -3,6 +3,7 @@ import sys
 import random
 import math
 import json
+import unittest
 
 # Initialise Pygame
 pygame.init()
@@ -477,7 +478,7 @@ def main():
                     if easy.collidepoint(x, y):
                         COLS, ROWS = 10, 8
                         CELL_SIZE = WIDTH // COLS
-                        NOS_MINES = 1
+                        NOS_MINES = 10
                         DIFFICULTY = "easy"
                         setup = True
                     elif medium.collidepoint(x, y):
@@ -537,6 +538,18 @@ def main():
         pygame.display.flip()
         clock.tick(FRAMERATE)
 
+class TestMinesweeper(unittest.TestCase):
+    def test_board(self):
+        global ROWS, COLS, NOS_MINES
+        ROWS = 8
+        COLS = 10
+        NOS_MINES = 10
+        board = initialise_board(0, 0)
+        self.assertEqual(len(board), ROWS)
+        for row in board:
+            self.assertEqual(len(row), COLS)
+
 # Run the game
 if __name__ == "__main__":
+    # unittest.main()
     main()
