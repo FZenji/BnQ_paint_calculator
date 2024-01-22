@@ -3,6 +3,7 @@ import sys
 import random
 import math
 import json
+import asyncio
 
 # Initialise Pygame
 pygame.init()
@@ -15,13 +16,13 @@ BOARDER = 10
 BOARDER_THICKNESS = 4
 SHAKE_DURATION = 4
 SHAKE_AMOUNT = BOARDER // 3
-TITLE_FONT = pygame.font.Font('Python/Minesweeper/vgasys.ttf', 50)
+TITLE_FONT = pygame.font.Font('vgasys.ttf', 50)
 FONT = pygame.font.Font(None, 36)
 
 # Define Images
 # TIMER_IMG = pygame.image.load('Python/Minesweeper/timer.png')
-TIMER_IMG = pygame.transform.scale(pygame.image.load('Python/Minesweeper/timer.png'), (30, 30))
-TIMER_IMG_LARGE = pygame.transform.scale(pygame.image.load('Python/Minesweeper/timer.png'), (100, 100))
+TIMER_IMG = pygame.transform.scale(pygame.image.load('timer.png'), (30, 30))
+TIMER_IMG_LARGE = pygame.transform.scale(pygame.image.load('timer.png'), (100, 100))
 
 # Define colors
 WHITE = (255, 255, 255)
@@ -177,7 +178,7 @@ def flood_fill(row, col, board, revealed, flagged):
                 flood_fill(row - 1, col - 1, board, revealed, flagged)
 
 # Function to play the explosion animation
-def end_game(row, col, board, revealed, flagged):
+async def end_game(row, col, board, revealed, flagged):
     cell_rect = pygame.Rect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
     for i in range(SHAKE_DURATION * FRAMERATE):
         pygame.time.delay(10)
@@ -189,6 +190,7 @@ def end_game(row, col, board, revealed, flagged):
         pygame.draw.circle(screen, ORANGE, cell_rect.move(x_off, y_off).center, CELL_SIZE // 4 - BOARDER)
         pygame.draw.circle(screen, RED, cell_rect.move(x_off, y_off).center, CELL_SIZE // 5 - BOARDER)
         pygame.display.flip()
+        await asyncio.sleep(0)
 
     cell_rect = pygame.Rect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
     max_radius = max([
@@ -200,8 +202,9 @@ def end_game(row, col, board, revealed, flagged):
     for radius in range(int(CELL_SIZE // 2 - BOARDER), math.ceil(max_radius)):
         pygame.draw.circle(screen, BLACK, cell_rect.center, radius)
         pygame.display.flip()
+        await asyncio.sleep(0)
 
-def win_game(board, revealed, flagged, end_time):
+async def win_game(board, revealed, flagged, end_time):
     for row in range(ROWS):
         for col in range(COLS):
             if board[row][col] != -1:
@@ -219,14 +222,17 @@ def win_game(board, revealed, flagged, end_time):
                     pygame.time.delay(int((0.5/max_radius) * 1000))
                     pygame.draw.circle(screen, CHOSEN_PALETTES[2], cell_rect.center, radius)
                     pygame.display.flip()
+                    await asyncio.sleep(0)
             pygame.display.flip()
+            await asyncio.sleep(0)
     for y in range(HEIGHT):
         pygame.time.delay(int(1/HEIGHT) * 1000)
         pygame.draw.rect(screen, CHOSEN_PALETTES[3], pygame.Rect(0, 0, WIDTH, y))
         pygame.display.flip()
+        await asyncio.sleep(0)
 
 
-def start_game():
+async def start_game():
     revealed = [[False for _ in range(COLS)] for _ in range(ROWS)]
     flagged = [[False for _ in range(COLS)] for _ in range(ROWS)]
     board = [[0 for _ in range(COLS)] for _ in range(ROWS)]
@@ -234,11 +240,12 @@ def start_game():
         draw_board(board, revealed, flagged)
         pygame.draw.circle(screen, BLACK, (WIDTH // 2, HEIGHT // 2), radius)
         pygame.display.flip()
+        await asyncio.sleep(0)
     start_time = pygame.time.get_ticks()
     return revealed, flagged, board, start_time
 
 def write_to_json(total_time):
-    with open('Python/Minesweeper/times.json', 'r+') as file:
+    with open('times.json', 'r+') as file:
         file_data = json.load(file)
         file_data[DIFFICULTY].append(total_time)
         file.seek(0)
@@ -361,7 +368,7 @@ def draw_leaderboard():
     return back_rect.inflate(250, 100)
 
 # Main game loop
-def main():
+async def main():
     clock = pygame.time.Clock()
     game_over = True
     main_menu = True
@@ -370,6 +377,7 @@ def main():
     game_lost = False
     setup = False
     leaderboard = False
+    play_rect, leaderboard_rect, quit_rect = draw_menu()
 
     # Globals
     global COLS, ROWS, CELL_SIZE, NOS_MINES, DIFFICULTY
@@ -396,7 +404,7 @@ def main():
                                 game_over = True
                                 game_lost = True
                                 # main_menu = True
-                                end_game(row, col, board, revealed, flagged)
+                                await end_game(row, col, board, revealed, flagged)
                         elif event.button == 3 and not revealed[row][col]:
                             # Right click to flag/unflag cell
                             if flagged[row][col]:
@@ -411,7 +419,7 @@ def main():
                             print("Game Won!")
                             game_over = True
                             game_won = True
-                            win_game(board, revealed, flagged, end_time)
+                            await win_game(board, revealed, flagged, end_time)
                 elif main_menu:
                     if play_rect.collidepoint(x, y):
                         difficulty_select = True
@@ -445,7 +453,7 @@ def main():
                         setup = False
                         game_over = False
                         difficulty_select = False
-                        revealed, flagged, board, start_time = start_game()
+                        revealed, flagged, board, start_time = await start_game()
                 elif game_lost:
                     if retry.collidepoint(x, y):
                         game_lost = False
@@ -484,8 +492,9 @@ def main():
             print("NOOOO")
         
         pygame.display.flip()
+        await asyncio.sleep(0)
         clock.tick(FRAMERATE)
 
 # Run the game
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
