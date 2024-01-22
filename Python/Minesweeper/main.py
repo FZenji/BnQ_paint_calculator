@@ -17,10 +17,10 @@ BOARDER_THICKNESS = 4
 SHAKE_DURATION = 4
 SHAKE_AMOUNT = BOARDER // 3
 TITLE_FONT = pygame.font.Font('vgasys.ttf', 50)
+TITLE_FONT_SMALL = pygame.font.Font('vgasys.ttf', 40)
 FONT = pygame.font.Font(None, 36)
 
 # Define Images
-# TIMER_IMG = pygame.image.load('Python/Minesweeper/timer.png')
 TIMER_IMG = pygame.transform.scale(pygame.image.load('timer.png'), (30, 30))
 TIMER_IMG_LARGE = pygame.transform.scale(pygame.image.load('timer.png'), (100, 100))
 
@@ -247,9 +247,17 @@ async def start_game():
 def write_to_json(total_time):
     with open('times.json', 'r+') as file:
         file_data = json.load(file)
-        file_data[DIFFICULTY].append(total_time)
+        file_data[DIFFICULTY].append(total_time  / 1000)
         file.seek(0)
         json.dump(file_data, file, indent=2)
+
+def read_json():
+    with open('times.json', 'r') as file:
+        file_data = json.load(file)
+        for key, value in file_data.items():
+            file_data[key].sort()
+            file_data[key] = value + [''] * (10 - len(value) if len(value) <= 10 else 0)
+    return file_data
 
 # Function to draw the main menu
 def draw_menu():
@@ -355,14 +363,56 @@ def draw_game_won(total_time):
     
     return again_rect.inflate(250, 100)
 
-def draw_leaderboard():
+def draw_leaderboard(file_data):
+    offset_x = 75
+    title_text = TITLE_FONT.render("Leaderboard", True, WHITE)
+    title_rect = title_text.get_rect(center=(WIDTH // 2, 75))
+
+    nos_text = TITLE_FONT.render("#", True, WHITE)
+    nos_rect = nos_text.get_rect(center=(WIDTH // 8 - 25, 200))
+
+    numbers_text = TITLE_FONT_SMALL.render('\n'.join([f' {str(i + 1)}' if i != 9 else str(i + 1) for i in range(10)]), True, WHITE)
+    numbers_rect = numbers_text.get_rect(center=(WIDTH // 8 - 25, 475))
+
+    easy_text = TITLE_FONT.render("Easy", True, WHITE)
+    easy_rect = easy_text.get_rect(center=(WIDTH // 5 + offset_x, 200))
+
+    medium_text = TITLE_FONT.render("Medium", True, WHITE)
+    medium_rect = medium_text.get_rect(center=(WIDTH // 2 + offset_x, 200))
+
+    hard_text = TITLE_FONT.render("Hard", True, WHITE)
+    hard_rect = hard_text.get_rect(center=(4 * (WIDTH // 5) + offset_x - 25, 200))
+
+    pygame.draw.line(screen, WHITE, (WIDTH // 8 - 75, 235), (7 * (WIDTH // 8) + 75, 235), 4)
+    pygame.draw.line(screen, WHITE, (WIDTH // 8 + 25, 150), (WIDTH // 8 + 25, 700), 4)
+    pygame.draw.line(screen, WHITE, (WIDTH // 3 + offset_x, 150), (WIDTH // 3 + offset_x, 700), 4)
+    pygame.draw.line(screen, WHITE, (2 * (WIDTH // 3) + offset_x, 150), (2 * (WIDTH // 3) + offset_x, 700), 4)
+
     back_text = TITLE_FONT.render("Back <-", True, WHITE)
-    back_rect = back_text.get_rect(center=(WIDTH // 2, 750))
+    back_rect = back_text.get_rect(center=(WIDTH // 2, 850))
     hovered = back_rect.inflate(250, 100).collidepoint(pygame.mouse.get_pos())
     if hovered:
         pygame.draw.rect(screen, (100, 100, 100), back_rect.inflate(250, 100))
     pygame.draw.rect(screen, ((225, 225, 225) if hovered else (255, 255, 255)), back_rect.inflate(250, 100), 4)
 
+    easy_times_text = TITLE_FONT_SMALL.render('\n'.join([(f"{round(float(file_data['easy'][i]), 1) if file_data['easy'][i] != '' else '':^10}").rjust(3) for i in range(10)]), True, WHITE)
+    easy_times_rect = easy_times_text.get_rect(center=(WIDTH // 5 + offset_x, 475))
+
+    medium_times_text = TITLE_FONT_SMALL.render('\n'.join([(f"{round(float(file_data['medium'][i]), 1) if file_data['medium'][i] != '' else '':^10}").rjust(3) for i in range(10)]), True, WHITE)
+    medium_times_rect = medium_times_text.get_rect(center=(WIDTH // 2 + offset_x, 475))
+
+    hard_times_text = TITLE_FONT_SMALL.render('\n'.join([(f"{round(float(file_data['hard'][i]), 1) if file_data['hard'][i] != '' else '':^10}").rjust(3) for i in range(10)]), True, WHITE)
+    hard_times_rect = hard_times_text.get_rect(center=(4 * (WIDTH // 5) + offset_x - 25, 475))
+
+    screen.blit(title_text, title_rect)
+    screen.blit(nos_text, nos_rect)
+    screen.blit(numbers_text, numbers_rect)
+    screen.blit(easy_times_text, easy_times_rect)
+    screen.blit(medium_times_text, medium_times_rect)
+    screen.blit(hard_times_text, hard_times_rect)
+    screen.blit(easy_text, easy_rect)
+    screen.blit(medium_text, medium_rect)
+    screen.blit(hard_text, hard_rect)
     screen.blit(back_text, back_rect)
 
     return back_rect.inflate(250, 100)
@@ -426,6 +476,7 @@ async def main():
                         main_menu = False
                     elif leaderboard_rect.collidepoint(x, y):
                         leaderboard = True
+                        file_data = read_json()
                         main_menu = False
                     elif quit_rect.collidepoint(x, y):
                         pygame.quit()
@@ -467,7 +518,7 @@ async def main():
                         leaderboard = False
                         main_menu = True
                 else:
-                    print("Nuar")
+                    print("Error setting flags")
                 
 
         if not game_over:
@@ -487,9 +538,9 @@ async def main():
             again = draw_game_won(total_time)
         elif leaderboard:
             screen.fill(BLACK)
-            back = draw_leaderboard()
+            back = draw_leaderboard(file_data)
         else:
-            print("NOOOO")
+            print("Error handling flags")
         
         pygame.display.flip()
         await asyncio.sleep(0)
