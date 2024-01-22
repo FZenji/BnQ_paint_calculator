@@ -2,7 +2,6 @@ import pygame
 import sys
 import random
 import math
-import time
 
 # Initialise Pygame
 pygame.init()
@@ -17,6 +16,11 @@ SHAKE_DURATION = 4
 SHAKE_AMOUNT = BOARDER // 3
 TITLE_FONT = pygame.font.Font('Python/Minesweeper/vgasys.ttf', 50)
 FONT = pygame.font.Font(None, 36)
+
+# Define Images
+# TIMER_IMG = pygame.image.load('Python/Minesweeper/timer.png')
+TIMER_IMG = pygame.transform.scale(pygame.image.load('Python/Minesweeper/timer.png'), (30, 30))
+TIMER_IMG_LARGE = pygame.transform.scale(pygame.image.load('Python/Minesweeper/timer.png'), (100, 100))
 
 # Define colors
 WHITE = (255, 255, 255)
@@ -74,7 +78,7 @@ def initialise_board(clicked_row, clicked_col):
     return board
 
 # Function to draw the game board
-def draw_board(board, revealed, flagged, game_over=False, game_won=False):
+def draw_board(board, revealed, flagged, game_over=False, game_won=False, start_time=pygame.time.get_ticks()):
     for row in range(ROWS):
         for col in range(COLS):
             cell_rect = pygame.Rect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
@@ -119,9 +123,9 @@ def draw_board(board, revealed, flagged, game_over=False, game_won=False):
                 hovered = cell_rect.collidepoint(pygame.mouse.get_pos())
                 colour = CHOSEN_PALETTES[0][2 if hovered else 0] if (row + col) % 2 == 0 else CHOSEN_PALETTES[0][3 if hovered else 1]
                 pygame.draw.rect(screen, colour, cell_rect)
-    draw_hud(flagged)
+    draw_hud(flagged, start_time)
 
-def draw_hud(flagged):
+def draw_hud(flagged, start_time):
     flag_size = 30
     offset_y = (HEIGHT - ROWS * CELL_SIZE) // 2 - (flag_size // 2) + 5
     offset_x = 50
@@ -135,7 +139,15 @@ def draw_hud(flagged):
                                       (WIDTH // 3 - offset_x + flag_size // 3 + 2, HEIGHT - offset_y - flag_size + 2 * (flag_size // 3)),
                                       (WIDTH // 3 - offset_x + flag_size // 3 + 2, HEIGHT - offset_y + 5)])
 
+
+    timer_text = FONT.render(f"{(pygame.time.get_ticks() - start_time) / 1000:.1f}", True, WHITE)
+    timer_rect = timer_text.get_rect(center=(2 * (WIDTH // 3), ROWS * CELL_SIZE + (HEIGHT - ROWS * CELL_SIZE) // 2))
+
+    timer_img_rect = pygame.Rect(2 * (WIDTH // 3) - offset_x - 25, HEIGHT - offset_y - flag_size + 2, flag_size, flag_size)
+
     screen.blit(flag_text, flag_rect)
+    screen.blit(timer_text, timer_rect)
+    screen.blit(TIMER_IMG, timer_img_rect)
 
 def flood_fill(row, col, board, revealed, flagged):
     if not revealed[row][col]:
@@ -167,7 +179,7 @@ def flood_fill(row, col, board, revealed, flagged):
 def end_game(row, col, board, revealed, flagged):
     cell_rect = pygame.Rect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
     for i in range(SHAKE_DURATION * FRAMERATE):
-        time.sleep(0.01)
+        pygame.time.delay(10)
         x_shake, y_shake = random.randint(-SHAKE_AMOUNT, SHAKE_AMOUNT), random.randint(-SHAKE_AMOUNT, SHAKE_AMOUNT)
         draw_board(board, revealed, flagged, game_over=True)
         pygame.draw.circle(screen, BLACK, cell_rect.move(x_shake, y_shake).center, CELL_SIZE // 2 - BOARDER)
@@ -188,27 +200,27 @@ def end_game(row, col, board, revealed, flagged):
         pygame.draw.circle(screen, BLACK, cell_rect.center, radius)
         pygame.display.flip()
 
-def win_game(board, revealed, flagged):
+def win_game(board, revealed, flagged, end_time):
     for row in range(ROWS):
         for col in range(COLS):
             if board[row][col] != -1:
                 board[row][col] = 0
                 flagged[row][col] = False
-    nos_cells = ROWS * COLS
     max_radius = CELL_SIZE // 2 - BOARDER
     for row in range(ROWS):
         for col in range(COLS):
             cell_rect = pygame.Rect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
             revealed[row][col] = True
-            draw_board(board, revealed, flagged, game_won=True)
+            draw_board(board, revealed, flagged, game_won=True, start_time=end_time)
             if board[row][col] == -1:
                 pygame.draw.circle(screen, BLACK, cell_rect.center, max_radius)
                 for radius in range(max_radius):
-                    time.sleep(0.5/max_radius)
+                    pygame.time.delay(int((0.5/max_radius) * 1000))
                     pygame.draw.circle(screen, CHOSEN_PALETTES[2], cell_rect.center, radius)
                     pygame.display.flip()
             pygame.display.flip()
     for y in range(HEIGHT):
+        pygame.time.delay(int(1/HEIGHT) * 1000)
         pygame.draw.rect(screen, CHOSEN_PALETTES[3], pygame.Rect(0, 0, WIDTH, y))
         pygame.display.flip()
 
@@ -221,7 +233,11 @@ def start_game():
         draw_board(board, revealed, flagged)
         pygame.draw.circle(screen, BLACK, (WIDTH // 2, HEIGHT // 2), radius)
         pygame.display.flip()
-    return revealed, flagged, board
+    start_time = pygame.time.get_ticks()
+    return revealed, flagged, board, start_time
+
+def write_to_json():
+    pass
 
 def show_leaderboard():
     pass
@@ -299,9 +315,14 @@ def draw_game_lost():
     
     return retry_rect.inflate(250, 100)
 
-def draw_game_won():
+def draw_game_won(total_time):
     title_text = TITLE_FONT.render("Congratulations!", True, WHITE)
     title_rect = title_text.get_rect(center=(WIDTH // 2, 75))
+
+    timer_img_rect = pygame.Rect(WIDTH // 2 - 50 - 100, HEIGHT // 2 - 50 - 100, 100, 100)
+    
+    time_text = TITLE_FONT.render(f"{(total_time / 10):.1f}", True, WHITE)
+    time_rect = title_text.get_rect(center=(WIDTH // 2 + 200, HEIGHT // 2 - 95))
 
     again_text = TITLE_FONT.render("Play Again", True, WHITE)
     again_rect = again_text.get_rect(center=(WIDTH // 2, 750))
@@ -311,6 +332,8 @@ def draw_game_won():
     pygame.draw.rect(screen, ((225, 225, 225) if hovered else (255, 255, 255)), again_rect.inflate(250, 100), 4)
 
     screen.blit(title_text, title_rect)
+    screen.blit(TIMER_IMG_LARGE, timer_img_rect)
+    screen.blit(time_text, time_rect)
     screen.blit(again_text, again_rect)
     
     return again_rect.inflate(250, 100)
@@ -359,10 +382,13 @@ def main():
                                 flagged[row][col] = not flagged[row][col]
                         # Check if the game is won
                         if [cell for row in revealed for cell in row].count(False) == NOS_MINES and not game_over:
+                            end_time = pygame.time.get_ticks()
+                            total_time = end_time - start_time
+                            write_to_json(total_time)
                             print("Game Won!")
                             game_over = True
                             game_won = True
-                            win_game(board, revealed, flagged)
+                            win_game(board, revealed, flagged, end_time)
                 elif main_menu:
                     if play_rect.collidepoint(x, y):
                         difficulty_select = True
@@ -373,7 +399,7 @@ def main():
                     if easy.collidepoint(x, y):
                         COLS, ROWS = 10, 8
                         CELL_SIZE = WIDTH // COLS
-                        NOS_MINES = 10
+                        NOS_MINES = 1
                         setup = True
                     elif medium.collidepoint(x, y):
                         COLS, ROWS = 18, 14
@@ -389,7 +415,7 @@ def main():
                         setup = False
                         game_over = False
                         difficulty_select = False
-                        revealed, flagged, board = start_game()
+                        revealed, flagged, board, start_time = start_game()
                 elif game_lost:
                     if retry.collidepoint(x, y):
                         game_lost = False
@@ -404,7 +430,7 @@ def main():
 
         if not game_over:
             screen.fill(BLACK)
-            draw_board(board, revealed, flagged)
+            draw_board(board, revealed, flagged, start_time=start_time)
         elif main_menu:
             screen.fill(BLACK)
             play_rect, leaderboard_rect = draw_menu()
@@ -416,7 +442,7 @@ def main():
             retry = draw_game_lost()
         elif game_won:
             screen.fill(LIGHT_BLUE)
-            again = draw_game_won()
+            again = draw_game_won(total_time)
         else:
             print("NOOOO")
         
