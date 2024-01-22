@@ -2,6 +2,7 @@ import pygame
 import sys
 import random
 import math
+import json
 
 # Initialise Pygame
 pygame.init()
@@ -236,11 +237,12 @@ def start_game():
     start_time = pygame.time.get_ticks()
     return revealed, flagged, board, start_time
 
-def write_to_json():
-    pass
-
-def show_leaderboard():
-    pass
+def write_to_json(total_time):
+    with open('Python/Minesweeper/times.json', 'r+') as file:
+        file_data = json.load(file)
+        file_data[DIFFICULTY].append(total_time)
+        file.seek(0)
+        json.dump(file_data, file, indent=2)
 
 # Function to draw the main menu
 def draw_menu():
@@ -261,11 +263,19 @@ def draw_menu():
         pygame.draw.rect(screen, (100, 100, 100), play_rect.move(0, 250).inflate(250, 100))
     pygame.draw.rect(screen, ((225, 225, 225) if hovered else (255, 255, 255)), play_rect.move(0, 250).inflate(250, 100), 4)
 
+    quit_text = TITLE_FONT.render("Quit", True, WHITE)
+    quit_rect = quit_text.get_rect(center=(WIDTH // 2, 750))
+    hovered = play_rect.move(0, 500).inflate(250, 100).collidepoint(pygame.mouse.get_pos())
+    if hovered:
+        pygame.draw.rect(screen, (100, 100, 100), play_rect.move(0, 500).inflate(250, 100))
+    pygame.draw.rect(screen, ((225, 225, 225) if hovered else (255, 255, 255)), play_rect.move(0, 500).inflate(250, 100), 4)
+
     screen.blit(title_text, title_rect)
     screen.blit(play_text, play_rect)
     screen.blit(leaderboard_text, leaderboard_rect)
+    screen.blit(quit_text, quit_rect)
 
-    return play_rect.inflate(250, 100), play_rect.move(0, 250).inflate(250, 100)
+    return play_rect.inflate(250, 100), play_rect.move(0, 250).inflate(250, 100), quit_rect.inflate(250, 100)
 
 def draw_difficulty():
     title_text = TITLE_FONT.render("Select Difficulty", True, WHITE)
@@ -338,6 +348,18 @@ def draw_game_won(total_time):
     
     return again_rect.inflate(250, 100)
 
+def draw_leaderboard():
+    back_text = TITLE_FONT.render("Back <-", True, WHITE)
+    back_rect = back_text.get_rect(center=(WIDTH // 2, 750))
+    hovered = back_rect.inflate(250, 100).collidepoint(pygame.mouse.get_pos())
+    if hovered:
+        pygame.draw.rect(screen, (100, 100, 100), back_rect.inflate(250, 100))
+    pygame.draw.rect(screen, ((225, 225, 225) if hovered else (255, 255, 255)), back_rect.inflate(250, 100), 4)
+
+    screen.blit(back_text, back_rect)
+
+    return back_rect.inflate(250, 100)
+
 # Main game loop
 def main():
     clock = pygame.time.Clock()
@@ -347,9 +369,10 @@ def main():
     game_won = False
     game_lost = False
     setup = False
+    leaderboard = False
 
     # Globals
-    global COLS, ROWS, CELL_SIZE, NOS_MINES
+    global COLS, ROWS, CELL_SIZE, NOS_MINES, DIFFICULTY
 
     while True:
         for event in pygame.event.get():
@@ -394,22 +417,29 @@ def main():
                         difficulty_select = True
                         main_menu = False
                     elif leaderboard_rect.collidepoint(x, y):
-                        show_leaderboard()
+                        leaderboard = True
+                        main_menu = False
+                    elif quit_rect.collidepoint(x, y):
+                        pygame.quit()
+                        sys.exit()
                 elif difficulty_select:
                     if easy.collidepoint(x, y):
                         COLS, ROWS = 10, 8
                         CELL_SIZE = WIDTH // COLS
                         NOS_MINES = 1
+                        DIFFICULTY = "easy"
                         setup = True
                     elif medium.collidepoint(x, y):
                         COLS, ROWS = 18, 14
                         CELL_SIZE = WIDTH // COLS
                         NOS_MINES = 40
+                        DIFFICULTY = "medium"
                         setup = True
                     elif hard.collidepoint(x, y):
                         COLS, ROWS = 24, 20
                         CELL_SIZE = WIDTH // COLS
                         NOS_MINES = 99
+                        DIFFICULTY = "hard"
                         setup = True
                     if setup:
                         setup = False
@@ -424,6 +454,10 @@ def main():
                     if again.collidepoint(x, y):
                         game_won = False
                         main_menu = True
+                elif leaderboard:
+                    if back.collidepoint(x, y):
+                        leaderboard = False
+                        main_menu = True
                 else:
                     print("Nuar")
                 
@@ -433,7 +467,7 @@ def main():
             draw_board(board, revealed, flagged, start_time=start_time)
         elif main_menu:
             screen.fill(BLACK)
-            play_rect, leaderboard_rect = draw_menu()
+            play_rect, leaderboard_rect, quit_rect = draw_menu()
         elif difficulty_select:
             screen.fill(BLACK)
             easy, medium, hard = draw_difficulty()
@@ -443,6 +477,9 @@ def main():
         elif game_won:
             screen.fill(LIGHT_BLUE)
             again = draw_game_won(total_time)
+        elif leaderboard:
+            screen.fill(BLACK)
+            back = draw_leaderboard()
         else:
             print("NOOOO")
         
