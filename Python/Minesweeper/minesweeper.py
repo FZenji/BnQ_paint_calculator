@@ -64,6 +64,23 @@ pygame.display.set_caption("Minesweeper Reloaded")
 
 # Function to initialise the game board
 def initialise_board(clicked_row, clicked_col):
+    """
+    Initialises a Minesweeper game board with mines randomly placed.
+
+    Args:
+        rows (int): Number of rows in the Minesweeper board.
+        cols (int): Number of columns in the Minesweeper board.
+        mines (int): Number of mines to be placed on the board.
+
+    Returns:
+        board (list): A 2D List containing the Initialised board.
+
+    Initialises a 2D list to represent the Minesweeper board with zeros (no mines).
+    Randomly places the specified number of mines on the board.
+    Calculates and sets the number of neighboring mines for each cell.
+    Initialises a 2D list to indicate whether each cell is revealed (initially all set to False).
+    Returns the Initialised board and the revealed state.
+    """
     board = [[0 for _ in range(COLS)] for _ in range(ROWS)]
     # Randomly place mines on the board, avoiding the clicked cell
     for _ in range(NOS_MINES):
@@ -81,12 +98,32 @@ def initialise_board(clicked_row, clicked_col):
 
 # Function to draw the game board
 def draw_board(board, revealed, flagged, game_over=False, game_won=False, start_time=pygame.time.get_ticks()):
+    """
+    Draws the Minesweeper game board on the screen.
+
+    Args:
+        board (list): 2D list representing the Minesweeper board.
+        revealed (list): 2D list indicating whether each cell is revealed.
+        flagged (list): 2D list indicating whether each cell is flagged.
+        game_over (bool, optional): Boolean indicating whether the game is over. Defaults to False.
+        game_won (bool, optional): Boolean indicating whether the game is won. Defaults to False.
+        start_time (int, optional): The time when the game started. Defaults to the current time using pygame.time.get_ticks().
+
+    Returns:
+        None
+
+    Draws cells based on their state (revealed, flagged, or mine) and displays numbers or mines accordingly.
+    Handles color-coding and hover effects for cells.
+    Calls draw_hud to display the Flags left and Timer.
+    """
     for row in range(ROWS):
         for col in range(COLS):
             cell_rect = pygame.Rect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
             if revealed[row][col]:
+                # Create checkerboard pattern
                 colour = CHOSEN_PALETTES[1][0] if (row + col) % 2 == 0 else CHOSEN_PALETTES[1][1]
                 pygame.draw.rect(screen, colour, cell_rect)
+                # Colour the numbers, depending on how many mines are near
                 if board[row][col] > 0:
                     number = str(board[row][col])
                     match number:
@@ -109,10 +146,14 @@ def draw_board(board, revealed, flagged, game_over=False, game_won=False, start_
                     text = FONT.render(number, True, font_colour)
                     text_rect = text.get_rect(center=cell_rect.center)
                     screen.blit(text, text_rect)
+                # Draw mines
                 elif board[row][col] == -1 and not game_over:
                     pygame.draw.circle(screen, CHOSEN_PALETTES[2] if game_won else BLACK, cell_rect.center, CELL_SIZE // 2 - BOARDER)
+            # Draw Flags
             elif flagged[row][col]:
+                # Checkerboard pattern
                 colour = CHOSEN_PALETTES[0][0] if (row + col) % 2 == 0 else CHOSEN_PALETTES[0][1]
+                # Flag polygon
                 pygame.draw.rect(screen, colour, cell_rect)
                 pygame.draw.polygon(screen, RED, [(col * CELL_SIZE + CELL_SIZE // 3 - 2, (row + 1) * CELL_SIZE - BOARDER), 
                                                   (col * CELL_SIZE + CELL_SIZE // 3 - 2, row * CELL_SIZE + BOARDER), 
@@ -122,15 +163,28 @@ def draw_board(board, revealed, flagged, game_over=False, game_won=False, start_
                                                   (col * CELL_SIZE + CELL_SIZE // 3 + 2, (row + 1) * CELL_SIZE - 5)])
 
             else:
+                # Hover effect
                 hovered = cell_rect.collidepoint(pygame.mouse.get_pos())
                 colour = CHOSEN_PALETTES[0][2 if hovered else 0] if (row + col) % 2 == 0 else CHOSEN_PALETTES[0][3 if hovered else 1]
                 pygame.draw.rect(screen, colour, cell_rect)
     draw_hud(flagged, start_time)
 
+# Function to draw the HUD (Flags left, and timer)
 def draw_hud(flagged, start_time):
+    """
+    Draws the Heads-Up Display (HUD) for the Minesweeper game.
+
+    Args:
+        flagged (list): A 2D list representing flagged cells.
+        start_time (int): The starting time of the game.
+
+    Draws the HUD displaying the number of remaining flags, and the game timer.
+    """
+    # Define variables
     flag_size = 30
     offset_y = (HEIGHT - ROWS * CELL_SIZE) // 2 - (flag_size // 2) + 5
     offset_x = 50
+    # Count how many flags are placed
     nos_flags = [i for row in flagged for i in row].count(True)
     flag_text = FONT.render(f"{NOS_MINES - nos_flags}", True, WHITE)
     flag_rect = flag_text.get_rect(center=(WIDTH // 3, ROWS * CELL_SIZE + (HEIGHT - ROWS * CELL_SIZE) // 2))
@@ -141,7 +195,7 @@ def draw_hud(flagged, start_time):
                                       (WIDTH // 3 - offset_x + flag_size // 3 + 2, HEIGHT - offset_y - flag_size + 2 * (flag_size // 3)),
                                       (WIDTH // 3 - offset_x + flag_size // 3 + 2, HEIGHT - offset_y + 5)])
 
-
+    # Draw timer
     timer_text = FONT.render(f"{(pygame.time.get_ticks() - start_time) / 1000:.1f}", True, WHITE)
     timer_rect = timer_text.get_rect(center=(2 * (WIDTH // 3), ROWS * CELL_SIZE + (HEIGHT - ROWS * CELL_SIZE) // 2))
 
@@ -151,12 +205,29 @@ def draw_hud(flagged, start_time):
     screen.blit(timer_text, timer_rect)
     screen.blit(TIMER_IMG, timer_img_rect)
 
+# Function to handle recursive flood fill
 def flood_fill(row, col, board, revealed, flagged):
+    """
+    Recursively performs flood fill on the Minesweeper board.
+
+    Args:
+        row (int): The row index of the starting tile.
+        col (int): The column index of the starting tile.
+        board (list): A 2D list representing the Minesweeper game board.
+        revealed (list): A 2D list indicating whether each cell is revealed.
+        flagged (list): A 2D list indicating whether each cell is flagged.
+
+    Recursively reveals connected tiles on the board using flood fill algorithm.
+    Stops recursion on revealed or flagged tiles and tiles with non-zero mine count.
+    """
+    # Only move to tiles that are not revealed, this stops an infinite recursive path
     if not revealed[row][col]:
+        # If the tile is not 0, stop recursing and return
         if board[row][col] != 0:
             revealed[row][col] = True
             flagged[row][col] = False
             return
+        # Otherwise keep recursing, making sure to mark the tiles already visisted
         else:
             revealed[row][col] = True
             flagged[row][col] = False
@@ -179,6 +250,19 @@ def flood_fill(row, col, board, revealed, flagged):
 
 # Function to play the explosion animation
 def end_game(row, col, board, revealed, flagged):
+    """
+    Initiates the end-game animation for a Minesweeper cell explosion.
+
+    Args:
+        row (int): The row index of the cell to explode.
+        col (int): The column index of the cell to explode.
+        board (list): A 2D list representing the Minesweeper game board.
+        revealed (list): A 2D list indicating whether each cell is revealed.
+        flagged (list): A 2D list indicating whether each cell is flagged.
+
+    Initiates an explosion animation at the specified cell position.
+    The animation includes shaking, explosions, and a circular fade-out effect.
+    """
     cell_rect = pygame.Rect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
     for i in range(SHAKE_DURATION * FRAMERATE):
         pygame.time.delay(10)
@@ -202,7 +286,20 @@ def end_game(row, col, board, revealed, flagged):
         pygame.draw.circle(screen, BLACK, cell_rect.center, radius)
         pygame.display.flip()
 
+# Function to show a win animation
 def win_game(board, revealed, flagged, end_time):
+    """
+    Initiates the win-game animation for a Minesweeper game.
+
+    Args:
+        board (list): A 2D list representing the Minesweeper game board.
+        revealed (list): A 2D list indicating whether each cell is revealed.
+        flagged (list): A 2D list indicating whether each cell is flagged.
+        end_time (int): The timestamp when the game was won.
+
+    Initiates an animation where all non-mine cells are revealed and a
+    colorful celebration occurs, including expanding circles and a fading screen.
+    """
     for row in range(ROWS):
         for col in range(COLS):
             if board[row][col] != -1:
@@ -226,8 +323,22 @@ def win_game(board, revealed, flagged, end_time):
         pygame.draw.rect(screen, CHOSEN_PALETTES[3], pygame.Rect(0, 0, WIDTH, y))
         pygame.display.flip()
 
-
+# Function to initialise a new Minesweeper game.
 def start_game():
+    """
+    Initialises a new Minesweeper game.
+
+    Returns:
+        tuple: A tuple containing the initial state of the game.
+            The tuple includes:
+                - revealed (list): A 2D list indicating whether each cell is revealed.
+                - flagged (list): A 2D list indicating whether each cell is flagged.
+                - board (list): A 2D list representing the Minesweeper game board.
+                - start_time (int): The timestamp when the game started.
+
+    Initialises a new Minesweeper game by creating empty game board, setting up initial
+    revealed and flagged states, and gradually revealing the board with a circular animation.
+    """
     revealed = [[False for _ in range(COLS)] for _ in range(ROWS)]
     flagged = [[False for _ in range(COLS)] for _ in range(ROWS)]
     board = [[0 for _ in range(COLS)] for _ in range(ROWS)]
@@ -238,14 +349,36 @@ def start_game():
     start_time = pygame.time.get_ticks()
     return revealed, flagged, board, start_time
 
+# Function to write times to json after a game win
 def write_to_json(total_time):
+    """
+    Writes the total time of a completed Minesweeper game to a JSON file.
+
+    Args:
+        total_time (int): The total time in milliseconds taken to complete the game.
+
+    Opens the 'times.json' file, reads the existing data, appends the total time to
+    the appropriate difficulty level, and writes the updated data back to the file.
+    """
     with open('Python/Minesweeper/times.json', 'r+') as file:
         file_data = json.load(file)
         file_data[DIFFICULTY].append(total_time / 1000)
         file.seek(0)
         json.dump(file_data, file, indent=2)
 
+# Function to read json files when accessing leaderboard
 def read_json():
+    """
+    Reads the Minesweeper leaderboard data from a JSON file.
+
+    Opens the 'times.json' file, reads the data, and sorts the times for each
+    difficulty level in ascending order. It pads the list with empty strings to
+    ensure a fixed size of 10 entries.
+
+    Returns:
+        dict: A dictionary containing difficulty levels as keys and sorted lists
+              of completion times as values, padded to a maximum of 10 entries.
+    """
     with open('Python/Minesweeper/times.json', 'r') as file:
         file_data = json.load(file)
         for key, value in file_data.items():
@@ -255,6 +388,31 @@ def read_json():
 
 # Function to draw the main menu
 def draw_menu():
+    """
+    Draws the main menu of Minesweeper Reloaded.
+
+    Renders the title, "Minesweeper Reloaded," as well as options to play, view
+    the leaderboard, and quit the game. The menu highlights the selected option
+    on mouse hover.
+
+    Returns:
+        Tuple[pygame.Rect, pygame.Rect, pygame.Rect]: Rectangles representing the
+        clickable areas for Play, Leaderboard, and Quit options, respectively.
+
+    Notes:
+        The function assumes a global variable `screen` is available.
+
+    Example:
+        play_rect, leaderboard_rect, quit_rect = draw_menu()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                if play_rect.collidepoint(event.pos):
+                    # Handle Play button click
+                elif leaderboard_rect.collidepoint(event.pos):
+                    # Handle Leaderboard button click
+                elif quit_rect.collidepoint(event.pos):
+                    # Handle Quit button click
+    """
     title_text = TITLE_FONT.render("Minesweeper Reloaded", True, WHITE)
     title_rect = title_text.get_rect(center=(WIDTH // 2, 75))
 
@@ -286,7 +444,32 @@ def draw_menu():
 
     return play_rect.inflate(250, 100), play_rect.move(0, 250).inflate(250, 100), quit_rect.inflate(250, 100)
 
+# Function to draw the select difficulty menu
 def draw_difficulty():
+    """
+    Draws the difficulty selection menu of Minesweeper Reloaded.
+
+    Renders the title, "Select Difficulty," and options to choose Easy, Medium,
+    or Hard difficulty. The menu highlights the selected option on mouse hover.
+
+    Returns:
+        Tuple[pygame.Rect, pygame.Rect, pygame.Rect]: Rectangles representing the
+        clickable areas for Easy, Medium, and Hard difficulty options, respectively.
+
+    Notes:
+        The function assumes a global variable `screen` is available.
+
+    Example:
+        easy_rect, medium_rect, hard_rect = draw_difficulty()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                if easy_rect.collidepoint(event.pos):
+                    # Handle Easy difficulty selection
+                elif medium_rect.collidepoint(event.pos):
+                    # Handle Medium difficulty selection
+                elif hard_rect.collidepoint(event.pos):
+                    # Handle Hard difficulty selection
+    """
     title_text = TITLE_FONT.render("Select Difficulty", True, WHITE)
     title_rect = title_text.get_rect(center=(WIDTH // 2, 75))
 
@@ -318,7 +501,26 @@ def draw_difficulty():
 
     return easy_rect.inflate(250, 100), medium_rect.inflate(250, 100), hard_rect.inflate(250, 100)
 
+# Function to draw the retry screen
 def draw_game_lost():
+    """
+    Draws the game over screen with the option to retry.
+
+    Renders the title, "Game Over!" and a "Retry" option. The function highlights
+    the "Retry" option on mouse hover.
+
+    Returns:
+        pygame.Rect: Rectangle representing the clickable area for the "Retry" option.
+
+    Notes:
+        The function assumes a global variable `screen` is available.
+
+    Example:
+        retry_rect = draw_game_lost()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1 and retry_rect.collidepoint(event.pos):
+                # Handle retrying the game after a loss
+    """
     title_text = TITLE_FONT.render("Game Over!", True, WHITE)
     title_rect = title_text.get_rect(center=(WIDTH // 2, 75))
 
@@ -334,7 +536,26 @@ def draw_game_lost():
     
     return retry_rect.inflate(250, 100)
 
+# Function to draw the game won screen with final time
 def draw_game_won(total_time):
+    """
+    Draws the game won screen with congratulations, final time, and a "Play Again" option.
+
+    Args:
+        total_time (float): The total time taken to complete the game, in milliseconds.
+
+    Returns:
+        pygame.Rect: Rectangle representing the clickable area for the "Play Again" option.
+
+    Notes:
+        The function assumes global variables `screen`, `TIMER_IMG_LARGE`, and `WHITE` are available.
+
+    Example:
+        play_again_rect = draw_game_won(total_time)
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1 and play_again_rect.collidepoint(event.pos):
+                # Handle restarting the game after a win
+    """
     title_text = TITLE_FONT.render("Congratulations!", True, WHITE)
     title_rect = title_text.get_rect(center=(WIDTH // 2, 75))
 
@@ -357,7 +578,27 @@ def draw_game_won(total_time):
     
     return again_rect.inflate(250, 100)
 
+# Function to draw the leaderboards
 def draw_leaderboard(file_data):
+    """
+    Draws the leaderboard screen with rankings, difficulty levels, and corresponding completion times.
+
+    Args:
+        file_data (dict): A dictionary containing time data for different difficulty levels.
+
+    Returns:
+        pygame.Rect: Rectangle representing the clickable area for the "Back" option.
+
+    Notes:
+        The function assumes global variables `screen`, `WIDTH`, `WHITE`, `TITLE_FONT`, `TITLE_FONT_SMALL`,
+        and other relevant constants are available.
+
+    Example:
+        back_rect = draw_leaderboard(file_data)
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1 and back_rect.collidepoint(event.pos):
+                # Handle going back to the main menu
+    """
     offset_x = 75
     title_text = TITLE_FONT.render("Leaderboard", True, WHITE)
     title_rect = title_text.get_rect(center=(WIDTH // 2, 75))
@@ -413,6 +654,14 @@ def draw_leaderboard(file_data):
 
 # Main game loop
 def main():
+    """
+    Main game loop handling events, game states, and screen updates.
+
+    Notes:
+        The function assumes global variables and constants, such as `screen`, `WIDTH`, `HEIGHT`, `WHITE`,
+        `FRAMERATE`, `CELL_SIZE`, `NOS_MINES`, `DIFFICULTY`, `COLS`, `ROWS`, and other relevant variables, 
+        are available.
+    """
     clock = pygame.time.Clock()
     game_over = True
     main_menu = True
@@ -454,12 +703,16 @@ def main():
                                 flagged[row][col] = not flagged[row][col]
                         # Check if the game is won
                         if [cell for row in revealed for cell in row].count(False) == NOS_MINES and not game_over:
+                            # Calculate time taken
                             end_time = pygame.time.get_ticks()
                             total_time = end_time - start_time
+                            # Write the time to json
                             write_to_json(total_time)
                             game_over = True
                             game_won = True
+                            # Play win animation
                             win_game(board, revealed, flagged, end_time)
+                # On the main menu
                 elif main_menu:
                     if play_rect.collidepoint(x, y):
                         difficulty_select = True
@@ -471,6 +724,7 @@ def main():
                     elif quit_rect.collidepoint(x, y):
                         pygame.quit()
                         sys.exit()
+                # On the difficulty select screen
                 elif difficulty_select:
                     if easy.collidepoint(x, y):
                         COLS, ROWS = 10, 8
@@ -495,22 +749,25 @@ def main():
                         game_over = False
                         difficulty_select = False
                         revealed, flagged, board, start_time = start_game()
+                # On the retry screen
                 elif game_lost:
                     if retry.collidepoint(x, y):
                         game_lost = False
                         main_menu = True
+                # On the game won screen
                 elif game_won:
                     if again.collidepoint(x, y):
                         game_won = False
                         main_menu = True
+                # On the leaderboard screen
                 elif leaderboard:
                     if back.collidepoint(x, y):
                         leaderboard = False
                         main_menu = True
+                # Catch no screen error
                 else:
                     print("Error setting flags")
                 
-
         if not game_over:
             screen.fill(BLACK)
             draw_board(board, revealed, flagged, start_time=start_time)
@@ -532,11 +789,38 @@ def main():
         else:
             print("Error handling flags")
         
+        # Main display update and clock tick
         pygame.display.flip()
         clock.tick(FRAMERATE)
 
+# Testing class
 class TestMinesweeper(unittest.TestCase):
+    """
+    A testing class for Minesweeper functionality.
+
+    Attributes:
+        ROWS (int): The number of rows in the Minesweeper board.
+        COLS (int): The number of columns in the Minesweeper board.
+        NOS_MINES (int): The number of mines in the Minesweeper board.
+
+    Example:
+        unittest.main()
+
+    """
     def test_board(self):
+        """
+        Test the initialization of the Minesweeper board.
+
+        This test ensures that the Minesweeper board is correctly initialised with the specified number of
+        rows, columns, and mines. It checks the dimensions of the board and each row.
+
+        Returns:
+            None
+
+        Example:
+            self.test_board()
+
+        """
         global ROWS, COLS, NOS_MINES
         ROWS = 8
         COLS = 10
