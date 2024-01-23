@@ -699,6 +699,7 @@ def main():
                             # Right click to flag/unflag cell
                             if flagged[row][col]:
                                 flagged[row][col] = not flagged[row][col]
+                            # Cannot place more flags than there are mines
                             elif not flagged[row][col] and [i for row in flagged for i in row].count(True) < NOS_MINES:
                                 flagged[row][col] = not flagged[row][col]
                         # Check if the game is won
