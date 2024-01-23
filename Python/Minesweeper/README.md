@@ -39,6 +39,11 @@ python minesweeper.py
 
 ## Screenshots
 
+![Main Menu](/Python/Minesweeper/screenshots/menu.PNG?raw=True "Main Menu")
+![Gameplay](/Python/Minesweeper/screenshots/gameplay.PNG?raw=True "Gameplay")
+![Lose](/Python/Minesweeper/screenshots/lose.PNG?raw=True "Lose")
+![Leaderboard](/Python/Minesweeper/screenshots/leaderboard.PNG?raw=True "Leaderboard")
+
 ## Project Structure
 
 - `minesweeper.py`: Main game implementation.
