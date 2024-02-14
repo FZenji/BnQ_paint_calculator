@@ -232,25 +232,19 @@ Fill out the adaptive card you created in step 3 of the setup and press the `Sub
 
 <p align="center">
   <img src="./images/ticketCard.PNG" />
-   <!-- ![Ticket card](./images/ticketCard.PNG) -->
 </p>
 
 Check both terminals to see if the request was successful.
 
 <p align="center">
-  <img src="./images/checkNgrok.PNG" />
+  <img src="./images/checkNgrok.png" />
   <img src="./images/checkFlask.PNG" />
-
-   <!-- ![Check ngrok](./images/checkNgrok.png)
-   ![Check Flask](./images/checkFlask.PNG) -->
 </p>
 
 Check your direct chats to see if a confirmation message was sent.
 
 <p align="center">
   <img src="./images/checkChats.PNG" />
-   <!-- 
-   ![Check chats](./images/checkChats.PNG) -->
 </p>
 
 Check the SQS queues in the AWS Management Console by polling them and confirming the message is in the correct queue.
@@ -259,9 +253,6 @@ Check the SQS queues in the AWS Management Console by polling them and confirmin
   <img src="./images/checkHighQ.PNG" />
   <img src="./images/queuePolling.PNG" />
   <img src="./images/checkSQS.PNG" />
-   <!-- ![Check High priority queue](./images/checkHighQ.PNG)
-   ![Poll SQS queue](./images/queuePolling.PNG)
-   ![Check SQS](./images/checkSQS.PNG) -->
 </p>
 
 <p align="right"><a href="#readme-top">Back to top &#8593;</a></p>
@@ -279,7 +270,6 @@ Distributed under the MIT License. See `LICENSE.md` for more information.
 - [othneildrew README template](https://github.com/othneildrew/Best-README-Template/tree/master)
 
 <!-- MARKDOWN LINKS & IMAGES -->
-<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 
 [contributors-shield]: https://img.shields.io/github/contributors/FZenji/TSI-Training.svg?style=for-the-badge
 [contributors-url]: https://github.com/FZenji/TSI-Training/tree/master/AWS/Ticketing-System/graphs/contributors
