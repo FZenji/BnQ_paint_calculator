@@ -12,7 +12,7 @@
   <a href="https://github.com/FZenji/TSI-Training/tree/master/AWS/Ticketing-System">
     <img src="./images/ticket.svg"/>
   </a>
-    <!-- <h3 align="center">AWS Ticket Service</h3> -->
+    <h3 align="center">AWS Ticket Service</h3>
 
 <p align="center">
      A component of an IT Service Ticketing system that automates the classification and routing of support tickets. This system leverages AWS services to manage ticket queues, improving the efficiency and responsiveness of IT support services. 
@@ -322,7 +322,3 @@ Distributed under the MIT License. See `LICENSE.md` for more information.
 [aws-sqs-url]: https://aws.amazon.com/sqs/
 [teams.com]: https://img.shields.io/badge/Microsoft%20Teams-6264A7?logoColor=FFFFFF&style=for-the-badge&logo=microsoftteams
 [teams-url]: https://www.microsoft.com/en-gb/microsoft-teams/group-chat-software
-
-[![Power Automate][PowerAutomate.com]][power-automate-url]
-[![Amazon SQS][aws-sqs.com]][aws-sqs-url]
-[![Microsoft Teams][teams.com]][teams-url]
