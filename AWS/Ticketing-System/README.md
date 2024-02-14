@@ -12,7 +12,7 @@
   <a href="https://github.com/FZenji/TSI-Training/tree/master/AWS/Ticketing-System">
     <img src="./images/ticket.svg"/>
   </a>
-    <h3 align="center">AWS Ticketing System</h3>
+    <!-- <h3 align="center">AWS Ticket Service</h3> -->
 
 <p align="center">
      A component of an IT Service Ticketing system that automates the classification and routing of support tickets. This system leverages AWS services to manage ticket queues, improving the efficiency and responsiveness of IT support services. 
@@ -31,6 +31,13 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
+    <li>
+      <a href="#about-the-project">About The Project</a>
+      <ul>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#tools-used">Tools Used</a></li>
+      </ul>
+    </li>
     <li>
       <a href="#setup">Setup</a>
       <ul>
@@ -63,7 +70,28 @@
 
 # ITSM/Ticketing System Integration with AWS
 
-This document will cover the setup, configuration, and deployment of the ticketing system.
+This document will outline the features, tools used, setup, configuration, and deployment of the ticketing system.
+
+<!-- ABOUT THE PROJECT -->
+
+## About The Project
+
+The AWS Ticket Service enables issue ticketing from straight within Microsoft Teams. The user is presented with a configurable issue report ticket that offloads the inputted user data into a Power Automate Solution workflow that makes a POST request to a custom Python Flask backend API. The data is subsequently passed into scalable, priority based AWS SQS queues for further serverless processing via AWS Lambda or any other means.
+
+### Features
+
+- Customer Service: The customer is always the number one priority and this system allows them to send their problems directly to the relevant place in order to get them resolved as soon as possible.
+- Microsoft Teams: Fully integrated into Teams, allowing updates to tickets to be send directly to the customer keeping them informed and happy.
+- Power Automate Solutions: Automates the ticketing process, with in-built error handling, data validation and sanitisation.
+- AWS Cloud: Tickets are kept in AWS SQS queues, offering high availability, scalability, reliability, and performance.
+
+### Tools Used
+
+[![Python][python.org]][Flask-url]<br />
+[![Flask][Flask.com]][Flask-url]<br />
+[![Power Automate][PowerAutomate.com]][power-automate-url]<br />
+[![Amazon SQS][aws-sqs.com]][aws-sqs-url]<br />
+[![Microsoft Teams][teams.com]][teams-url]<br />
 
 <!-- SETUP -->
 
@@ -284,3 +312,17 @@ Distributed under the MIT License. See `LICENSE.md` for more information.
 [license-url]: https://github.com/FZenji/TSI-Training/tree/master/AWS/Ticketing-System/LICENSE.md
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/henry-tolenaar/
+[Python.org]: https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54
+[Python-url]: https://www.python.org/
+[Flask.com]: https://img.shields.io/badge/flask-%23000.svg?style=for-the-badge&logo=flask&logoColor=white
+[Flask-url]: https://flask.palletsprojects.com/en/3.0.x/
+[PowerAutomate.com]: https://img.shields.io/badge/power%20automate-0060aa?style=for-the-badge&logo=powerautomate
+[power-automate-url]: https://www.microsoft.com/en-gb/power-platform/products/power-automate
+[aws-sqs.com]: https://img.shields.io/badge/Amazon%20SQS-FF4F8F?logoColor=FFFFFF&style=for-the-badge&logo=amazonsqs
+[aws-sqs-url]: https://aws.amazon.com/sqs/
+[teams.com]: https://img.shields.io/badge/Microsoft%20Teams-6264A7?logoColor=FFFFFF&style=for-the-badge&logo=microsoftteams
+[teams-url]: https://www.microsoft.com/en-gb/microsoft-teams/group-chat-software
+
+[![Power Automate][PowerAutomate.com]][power-automate-url]
+[![Amazon SQS][aws-sqs.com]][aws-sqs-url]
+[![Microsoft Teams][teams.com]][teams-url]
