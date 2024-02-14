@@ -223,6 +223,7 @@ sqs.create_queue(QueueName='High', Attributes={'DelaySeconds': '5'})
 
 ## Deployment
 
+- Run the first workflow in the Power Automate solution from step 5 so that your adaptive card is sent to the channel and ready to be filled in.
 - Run the ngrok domain using the command `ngrok http --domain=your-domain-name.ngrok-free.app 5000` (make sure it is running on port **5000**) in a terminal.
 - In a separate terminal, run the Python flask app using the command `flask run` in the **same folder** that your flask app is located.
 
