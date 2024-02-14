@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg class="ionicon" viewBox="0 0 740 620" width="8rem" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="256" y1="32.001" x2="256" y2="479.999" id="gradient-0" gradientTransform="matrix(0.708635, 0.705576, -0.541852, 0.544201, 210.743986, -34.126053)">
+      <stop offset="0" style="stop-color: rgb(218, 85, 152);"/>
+      <stop offset="1" style="stop-color: rgb(4.4252% 23.219% 64.84%)"/>
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="311.03" y1="123.93" x2="311.03" y2="278.01" id="gradient-1" gradientTransform="matrix(0.717315, 0.696748, -0.105552, 0.108668, 137.899206, -38.783554)">
+      <stop offset="0" style="stop-color: rgb(197, 83, 154);"/>
+      <stop offset="1" style="stop-color: rgb(176, 80, 155);"/>
+    </linearGradient>
+    <style bx:fonts="Open Sans">@import url(https://fonts.googleapis.com/css2?family=Open+Sans%3Aital%2Cwght%400%2C300%3B0%2C400%3B0%2C500%3B0%2C600%3B0%2C700%3B0%2C800%3B1%2C300%3B1%2C400%3B1%2C500%3B1%2C600%3B1%2C700%3B1%2C800&amp;display=swap);</style>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="370" y1="499.999" x2="370" y2="593.966" id="gradient-2" gradientTransform="matrix(0.702723, 0.711464, -2.608976, 2.576924, 1432.548405, -1311.315984)">
+      <stop offset="0" style="stop-color: rgb(218, 85, 152);"/>
+      <stop offset="1" style="stop-color: rgb(11, 59, 165);"/>
+    </linearGradient>
+  </defs>
+  <g transform="matrix(1, 0, 0, 1, 86.140633, 0)">
+    <path stroke-miterlimit="10" stroke-width="32" d="M 393.909 146 C 376.655 128.74 375.6 101.105 391.489 82.58 C 392.804 81.039 392.708 78.746 391.269 77.32 L 347.139 33.14 C 345.62 31.622 343.158 31.622 341.639 33.14 L 271.299 103.48 C 268.704 106.075 266.749 109.238 265.589 112.72 C 263.247 119.796 257.707 125.354 250.639 127.72 C 247.155 128.881 243.989 130.836 241.389 133.43 L 60.999 313.78 C 59.481 315.299 59.481 317.761 60.999 319.28 L 105.129 363.41 C 106.555 364.848 108.848 364.944 110.389 363.63 C 137.656 340.213 180.047 355.094 186.694 390.416 C 189.315 404.348 185.465 418.716 176.229 429.47 C 174.915 431.011 175.011 433.304 176.449 434.73 L 220.579 478.86 C 222.098 480.378 224.56 480.378 226.079 478.86 L 406.479 298.47 C 409.074 295.871 411.028 292.704 412.189 289.22 C 414.532 282.144 420.071 276.586 427.139 274.22 C 430.621 273.06 433.785 271.105 436.379 268.51 L 506.719 198.17 C 508.238 196.651 508.238 194.189 506.719 192.67 L 462.589 148.54 C 461.164 147.102 458.87 147.006 457.329 148.32 C 438.83 164.236 411.196 163.225 393.909 146 L 393.909 146 Z" style="fill-rule: nonzero; fill: none; paint-order: stroke; stroke: url('#gradient-0');"/>
+    <path fill="none" stroke-miterlimit="10" stroke-width="32" stroke-linecap="round" d="M 278.359 140.44 L 261.849 123.93 M 322.379 184.46 L 311.369 173.46 M 366.399 228.49 L 355.399 217.48 M 415.929 278.01 L 399.419 261.5" style="paint-order: stroke; stroke: url('#gradient-1');"/>
+  </g>
+  <text style="fill: url('#gradient-2'); font-family: 'Open Sans'; font-size: 69px; font-weight: 700; paint-order: fill; white-space: pre;" x="47.892" y="573.486">AWS Ticket Service</text>
+</svg>

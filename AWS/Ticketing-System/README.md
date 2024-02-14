@@ -10,7 +10,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/FZenji/TSI-Training/tree/master/AWS/Ticketing-System">
-    <svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512" width="8rem"><path fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32" d="M366.05 146a46.7 46.7 0 01-2.42-63.42 3.87 3.87 0 00-.22-5.26l-44.13-44.18a3.89 3.89 0 00-5.5 0l-70.34 70.34a23.62 23.62 0 00-5.71 9.24h0a23.66 23.66 0 01-14.95 15h0a23.7 23.7 0 00-9.25 5.71L33.14 313.78a3.89 3.89 0 000 5.5l44.13 44.13a3.87 3.87 0 005.26.22 46.69 46.69 0 0165.84 65.84 3.87 3.87 0 00.22 5.26l44.13 44.13a3.89 3.89 0 005.5 0l180.4-180.39a23.7 23.7 0 005.71-9.25h0a23.66 23.66 0 0114.95-15h0a23.62 23.62 0 009.24-5.71l70.34-70.34a3.89 3.89 0 000-5.5l-44.13-44.13a3.87 3.87 0 00-5.26-.22 46.7 46.7 0 01-63.42-2.32z"/><path fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32" stroke-linecap="round" d="M250.5 140.44l-16.51-16.51M294.52 184.46l-11.01-11M338.54 228.49l-11-11.01M388.07 278.01l-16.51-16.51"/></svg>
+    <img src="./images/ticket.svg"/>
   </a>
     <h3 align="center">AWS Ticketing System</h3>
 
@@ -20,8 +20,6 @@
     <a href="https://github.com/FZenji/TSI-Training/tree/master/AWS/Ticketing-System"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/FZenji/TSI-Training/tree/master/AWS/Ticketing-System">View Demo</a>
-    ·
     <a href="https://github.com/FZenji/TSI-Training/tree/master/AWS/Ticketing-System/issues">Report Bug</a>
     ·
     <a href="https://github.com/FZenji/TSI-Training/tree/master/AWS/Ticketing-System/issues">Request Feature</a>
@@ -55,16 +53,19 @@
       </ul>
     </li>
     <li><a href="#deployment">Deployment</a></li>
-    <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
+      <ul>
+        <li><a href="#prerequisites">Usage</a></li>
       </ul>
+    <li><a href="#License">License</a></li>
+    <li><a href="#Acknowledgments">Acknowledgments</a></li>
   </ol>
 </details>
 
 # ITSM/Ticketing System Integration with AWS
 
-This document will cover the setup, deployment, and configuration of the ticketing system.
+This document will cover the setup, configuration, and deployment of the ticketing system.
+
+<!-- SETUP -->
 
 ## Setup
 
@@ -97,10 +98,11 @@ Click the ellipsis button on the left bar and search for `Developer Portal` and 
 1.  Open the `Developer Portal` app and select `Design and build Adaptive Cards`.
 2.  Click `+ New card` at the top of the page.
 3.  Drag and drop elements from the left menu to create your ticket as a card. 1. The ticket should a title, description, and priority level, and an `ActionSet` `Action.Submit` action. 2. Copy the json in the bottom panel and keep it somewhere you can later access. 3. Save the card.
-    Example Card:
-
-![Example card](./images/exampleCard.PNG)
-
+Example Card:
+<p align="center">
+  <img src="./images/exampleCard.PNG" />
+  <!-- ![Example card](./images/exampleCard.PNG) -->
+</p>
 <a name="step4"></a>
 
 ### Step 4. Go to [https://ngrok.com/](https://ngrok.com/) and create an account.
@@ -173,7 +175,7 @@ Click the ellipsis button on the left bar and search for `Developer Portal` and 
 
 <p align="right"><a href="#readme-top">Back to top &#8593;</a></p>
 
----
+<!-- CONFIGURATION -->
 
 ## AWS Configurations
 
@@ -217,7 +219,7 @@ sqs.create_queue(QueueName='High', Attributes={'DelaySeconds': '5'})
 
 <p align="right"><a href="#readme-top">Back to top &#8593;</a></p>
 
----
+<!-- DEPLOYMENT -->
 
 ## Deployment
 
@@ -228,24 +230,53 @@ sqs.create_queue(QueueName='High', Attributes={'DelaySeconds': '5'})
 
 Fill out the adaptive card you created in step 3 of the setup and press the `Submit` button.
 
-![Ticket card](./images/ticketCard.PNG)
+<p align="center">
+  <img src="./images/ticketCard.PNG" />
+   <!-- ![Ticket card](./images/ticketCard.PNG) -->
+</p>
 
 Check both terminals to see if the request was successful.
 
-![Check ngrok](./images/checkNgrok.png)
-![Check Flask](./images/checkFlask.PNG)
+<p align="center">
+  <img src="./images/checkNgrok.PNG" />
+  <img src="./images/checkFlask.PNG" />
+
+   <!-- ![Check ngrok](./images/checkNgrok.png)
+   ![Check Flask](./images/checkFlask.PNG) -->
+</p>
 
 Check your direct chats to see if a confirmation message was sent.
 
-![Check chats](./images/checkChats.PNG)
+<p align="center">
+  <img src="./images/checkChats.PNG" />
+   <!-- 
+   ![Check chats](./images/checkChats.PNG) -->
+</p>
 
 Check the SQS queues in the AWS Management Console by polling them and confirming the message is in the correct queue.
 
-![Check High priority queue](./images/checkHighQ.PNG)
+<p align="center">
+  <img src="./images/checkHighQ.PNG" />
+  <img src="./images/queuePolling.PNG" />
+  <img src="./images/checkSQS.PNG" />
+   <!-- ![Check High priority queue](./images/checkHighQ.PNG)
+   ![Poll SQS queue](./images/queuePolling.PNG)
+   ![Check SQS](./images/checkSQS.PNG) -->
+</p>
 
-![Poll SQS queue](./images/queuePolling.PNG)
+<p align="right"><a href="#readme-top">Back to top &#8593;</a></p>
 
-![Check SQS](./images/checkSQS.PNG)
+<!-- LICENSE -->
+
+## License
+
+Distributed under the MIT License. See `LICENSE.md` for more information.
+
+<!-- ACKNOWLEDGMENTS -->
+
+## Acknowledgments
+
+- [othneildrew README template](https://github.com/othneildrew/Best-README-Template/tree/master)
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
