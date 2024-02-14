@@ -1,0 +1,73 @@
+{
+  "type": "AdaptiveCard",
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.4",
+  "body": [
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "TextBlock",
+          "wrap": true,
+          "text": "Title",
+          "size": "Large",
+          "weight": "Bolder"
+        },
+        {
+          "type": "Input.Text",
+          "placeholder": "Enter a title for your ticket",
+          "id": "title"
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Issue",
+          "wrap": true,
+          "weight": "Bolder",
+          "size": "Large"
+        },
+        {
+          "type": "Input.Text",
+          "placeholder": "Describe your issue",
+          "isMultiline": true,
+          "id": "description"
+        }
+      ]
+    },
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Priority",
+          "wrap": true,
+          "weight": "Bolder",
+          "size": "Large"
+        }
+      ]
+    },
+    {
+      "type": "Input.ChoiceSet",
+      "choices": [
+        {
+          "title": "Low",
+          "value": "Low"
+        },
+        {
+          "title": "Medium",
+          "value": "Medium"
+        },
+        {
+          "title": "High",
+          "value": "High"
+        }
+      ],
+      "placeholder": "Placeholder text",
+      "id": "priority"
+    }
+  ]
+}
