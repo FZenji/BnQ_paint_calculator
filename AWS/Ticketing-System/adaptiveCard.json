@@ -4,51 +4,31 @@
   "version": "1.4",
   "body": [
     {
-      "type": "Container",
-      "items": [
-        {
-          "type": "TextBlock",
-          "wrap": true,
-          "text": "Title",
-          "size": "Large",
-          "weight": "Bolder"
-        },
-        {
-          "type": "Input.Text",
-          "placeholder": "Enter a title for your ticket",
-          "id": "title"
-        }
-      ]
+      "type": "TextBlock",
+      "wrap": true,
+      "text": "Issue Ticket",
+      "size": "Large",
+      "weight": "Bolder",
+      "horizontalAlignment": "Center"
     },
     {
-      "type": "Container",
-      "items": [
-        {
-          "type": "TextBlock",
-          "text": "Issue",
-          "wrap": true,
-          "weight": "Bolder",
-          "size": "Large"
-        },
-        {
-          "type": "Input.Text",
-          "placeholder": "Describe your issue",
-          "isMultiline": true,
-          "id": "description"
-        }
-      ]
+      "type": "Input.Text",
+      "placeholder": "Enter a title for your ticket",
+      "id": "title",
+      "isRequired": true,
+      "errorMessage": "Title is required",
+      "label": "Title",
+      "regex": "^(?!\\s*$).+"
     },
     {
-      "type": "Container",
-      "items": [
-        {
-          "type": "TextBlock",
-          "text": "Priority",
-          "wrap": true,
-          "weight": "Bolder",
-          "size": "Large"
-        }
-      ]
+      "type": "Input.Text",
+      "placeholder": "Describe your issue",
+      "isMultiline": true,
+      "id": "description",
+      "isRequired": true,
+      "errorMessage": "Description is required",
+      "label": "Description",
+      "regex": "^(?!\\s*$).+"
     },
     {
       "type": "Input.ChoiceSet",
@@ -66,8 +46,21 @@
           "value": "High"
         }
       ],
-      "placeholder": "Placeholder text",
-      "id": "priority"
+      "placeholder": "Priority",
+      "id": "priority",
+      "isRequired": true,
+      "errorMessage": "Must select a priority",
+      "label": "Priority"
+    },
+    {
+      "type": "ActionSet",
+      "actions": [
+        {
+          "type": "Action.Submit",
+          "title": "Submit Issue",
+          "associatedInputs": "auto"
+        }
+      ]
     }
   ]
 }
